@@ -109,11 +109,6 @@ class LibraryUpdateService(
         const val KEY_TARGET = "target"
 
         /**
-         * Key that defines what triggered the update
-         */
-        const val KEY_TRIGGER = "trigger"
-
-        /**
          * Returns the status of the service.
          *
          * @param context the application context.
