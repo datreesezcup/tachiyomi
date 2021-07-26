@@ -658,6 +658,9 @@
 
     <!-- Updates fragment -->
     <string name="updating_library">Updating library</string>
+    <string name="updates_last_update_info">Last Update: %1$s (%2$s)</string>
+    <string name="update_trigger_manual">Manual</string>
+    <string name="update_trigger_automatic">Automatic</string>
 
     <!-- History fragment -->
     <string name="recent_manga_time">Ch. %1$s - %2$s</string>

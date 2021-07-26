@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.chrisbanes.insetter.applyInsetter
 import eu.davidea.flexibleadapter.FlexibleAdapter
@@ -17,6 +18,7 @@ import eu.kanade.tachiyomi.data.download.DownloadService
 import eu.kanade.tachiyomi.data.download.model.Download
 import eu.kanade.tachiyomi.data.library.LibraryUpdateService
 import eu.kanade.tachiyomi.data.notification.Notifications
+import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.databinding.UpdatesControllerBinding
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
 import eu.kanade.tachiyomi.ui.base.controller.RootController
@@ -33,6 +35,8 @@ import kotlinx.coroutines.flow.onEach
 import reactivecircus.flowbinding.recyclerview.scrollStateChanges
 import reactivecircus.flowbinding.swiperefreshlayout.refreshes
 import timber.log.Timber
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 
 /**
  * Fragment that shows recent chapters.
@@ -48,6 +52,8 @@ class UpdatesController :
     ConfirmDeleteChaptersDialog.Listener,
     UpdatesAdapter.OnCoverClickListener {
 
+    private val preferences: PreferencesHelper = Injekt.get()
+
     /**
      * Action mode for multiple selection.
      */
@@ -56,7 +62,7 @@ class UpdatesController :
     /**
      * Adapter containing the recent chapters.
      */
-    var adapter: UpdatesAdapter? = null
+    var updatesAdapter: UpdatesAdapter? = null
         private set
 
     init {
@@ -92,9 +98,14 @@ class UpdatesController :
         val layoutManager = LinearLayoutManager(view.context)
         binding.recycler.layoutManager = layoutManager
         binding.recycler.setHasFixedSize(true)
-        adapter = UpdatesAdapter(this@UpdatesController, view.context)
-        binding.recycler.adapter = adapter
-        adapter?.fastScroller = binding.fastScroller
+        updatesAdapter = UpdatesAdapter(this@UpdatesController, view.context)
+
+        val usedAdapter = if (preferences.libraryUpdateLastTimestamp().get() > 0L) {
+            ConcatAdapter(UpdatesInfoHeaderAdapter(), updatesAdapter)
+        } else updatesAdapter
+
+        binding.recycler.adapter = usedAdapter
+        updatesAdapter?.fastScroller = binding.fastScroller
 
         binding.recycler.scrollStateChanges()
             .onEach {
@@ -121,7 +132,7 @@ class UpdatesController :
         destroyActionModeIfNeeded()
         (activity as? MainActivity)?.clearFixViewToBottom(binding.actionToolbar)
         binding.actionToolbar.destroy()
-        adapter = null
+        updatesAdapter = null
         super.onDestroyView(view)
     }
 
@@ -139,7 +150,7 @@ class UpdatesController :
 
     private fun updateLibrary() {
         activity?.let {
-            if (LibraryUpdateService.start(it)) {
+            if (LibraryUpdateService.start(it, trigger = LibraryUpdateService.Trigger.MANUAL)) {
                 it.toast(R.string.updating_library)
             }
         }
@@ -150,7 +161,7 @@ class UpdatesController :
      * @return list of selected chapters
      */
     private fun getSelectedChapters(): List<UpdatesItem> {
-        val adapter = adapter ?: return emptyList()
+        val adapter = updatesAdapter ?: return emptyList()
         return adapter.selectedPositions.mapNotNull { adapter.getItem(it) as? UpdatesItem }
     }
 
@@ -159,7 +170,7 @@ class UpdatesController :
      * @param position position of clicked item
      */
     override fun onItemClick(view: View, position: Int): Boolean {
-        val adapter = adapter ?: return false
+        val adapter = updatesAdapter ?: return false
 
         // Get item from position
         val item = adapter.getItem(position) as? UpdatesItem ?: return false
@@ -194,7 +205,7 @@ class UpdatesController :
      * @param position position of selected item
      */
     private fun toggleSelection(position: Int) {
-        val adapter = adapter ?: return
+        val adapter = updatesAdapter ?: return
         adapter.toggleSelection(position)
         actionMode?.invalidate()
     }
@@ -224,7 +235,7 @@ class UpdatesController :
      */
     fun onNextRecentChapters(chapters: List<IFlexible<*>>) {
         destroyActionModeIfNeeded()
-        adapter?.updateDataSet(chapters)
+        updatesAdapter?.updateDataSet(chapters)
         binding.recycler.onAnimationsFinished {
             (activity as? MainActivity)?.ready = true
         }
@@ -243,10 +254,10 @@ class UpdatesController :
      * @param download [Download] object containing download progress.
      */
     fun onChapterDownloadUpdate(download: Download) {
-        adapter?.currentItems
+        updatesAdapter?.currentItems
             ?.filterIsInstance<UpdatesItem>()
             ?.find { it.chapter.id == download.chapter.id }?.let {
-                adapter?.updateItem(it, it.status)
+                updatesAdapter?.updateItem(it, it.status)
             }
     }
 
@@ -283,7 +294,7 @@ class UpdatesController :
     override fun onCoverClick(position: Int) {
         destroyActionModeIfNeeded()
 
-        val chapterClicked = adapter?.getItem(position) as? UpdatesItem ?: return
+        val chapterClicked = updatesAdapter?.getItem(position) as? UpdatesItem ?: return
         openManga(chapterClicked)
     }
 
@@ -295,7 +306,7 @@ class UpdatesController :
      * Called when chapters are deleted
      */
     fun onChaptersDeleted() {
-        adapter?.notifyDataSetChanged()
+        updatesAdapter?.notifyDataSetChanged()
     }
 
     /**
@@ -307,23 +318,23 @@ class UpdatesController :
     }
 
     override fun downloadChapter(position: Int) {
-        val item = adapter?.getItem(position) as? UpdatesItem ?: return
+        val item = updatesAdapter?.getItem(position) as? UpdatesItem ?: return
         if (item.status == Download.State.ERROR) {
             DownloadService.start(activity!!)
         } else {
             downloadChapters(listOf(item))
         }
-        adapter?.updateItem(item)
+        updatesAdapter?.updateItem(item)
     }
 
     override fun deleteChapter(position: Int) {
-        val item = adapter?.getItem(position) as? UpdatesItem ?: return
+        val item = updatesAdapter?.getItem(position) as? UpdatesItem ?: return
         deleteChapters(listOf(item))
-        adapter?.updateItem(item)
+        updatesAdapter?.updateItem(item)
     }
 
     override fun startDownloadNow(position: Int) {
-        val chapter = adapter?.getItem(position) as? UpdatesItem ?: return
+        val chapter = updatesAdapter?.getItem(position) as? UpdatesItem ?: return
         presenter.startDownloadingNow(chapter)
     }
 
@@ -334,12 +345,12 @@ class UpdatesController :
      */
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.menuInflater.inflate(R.menu.generic_selection, menu)
-        adapter?.mode = SelectableAdapter.Mode.MULTI
+        updatesAdapter?.mode = SelectableAdapter.Mode.MULTI
         return true
     }
 
     override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-        val count = adapter?.selectedItemCount ?: 0
+        val count = updatesAdapter?.selectedItemCount ?: 0
         if (count == 0) {
             // Destroy action mode if there are no items selected.
             destroyActionModeIfNeeded()
@@ -385,8 +396,8 @@ class UpdatesController :
      * @param mode the ActionMode object
      */
     override fun onDestroyActionMode(mode: ActionMode?) {
-        adapter?.mode = SelectableAdapter.Mode.IDLE
-        adapter?.clearSelection()
+        updatesAdapter?.mode = SelectableAdapter.Mode.IDLE
+        updatesAdapter?.clearSelection()
 
         binding.actionToolbar.hide()
         (activity as? MainActivity)?.showBottomNav(visible = true, collapse = true)
@@ -395,13 +406,13 @@ class UpdatesController :
     }
 
     private fun selectAll() {
-        val adapter = adapter ?: return
+        val adapter = updatesAdapter ?: return
         adapter.selectAll()
         actionMode?.invalidate()
     }
 
     private fun selectInverse() {
-        val adapter = adapter ?: return
+        val adapter = updatesAdapter ?: return
         for (i in 0..adapter.itemCount) {
             adapter.toggleSelection(i)
         }

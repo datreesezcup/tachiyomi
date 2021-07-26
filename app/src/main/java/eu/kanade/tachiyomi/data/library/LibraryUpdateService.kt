@@ -54,6 +54,7 @@ import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
+import java.util.Date
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -93,6 +94,16 @@ class LibraryUpdateService(
         TRACKING // Tracking metadata
     }
 
+    /**
+     * Defines what triggered an update request
+     *
+     * This is only used when the update target is [Target.CHAPTERS]
+     */
+    enum class Trigger {
+        MANUAL,
+        AUTOMATIC
+    }
+
     companion object {
 
         private var instance: LibraryUpdateService? = null
@@ -106,6 +117,11 @@ class LibraryUpdateService(
          * Key that defines what should be updated.
          */
         const val KEY_TARGET = "target"
+
+        /**
+         * Key that defines what triggered the update
+         */
+        const val KEY_TRIGGER = "trigger"
 
         /**
          * Returns the status of the service.
@@ -126,10 +142,11 @@ class LibraryUpdateService(
          * @param target defines what should be updated.
          * @return true if service newly started, false otherwise
          */
-        fun start(context: Context, category: Category? = null, target: Target = Target.CHAPTERS): Boolean {
+        fun start(context: Context, category: Category? = null, target: Target = Target.CHAPTERS, trigger: Trigger = Trigger.AUTOMATIC): Boolean {
             return if (!isRunning(context)) {
                 val intent = Intent(context, LibraryUpdateService::class.java).apply {
                     putExtra(KEY_TARGET, target)
+                    putExtra(KEY_TRIGGER, trigger)
                     category?.let { putExtra(KEY_CATEGORY, it.id) }
                 }
                 ContextCompat.startForegroundService(context, intent)
@@ -200,6 +217,15 @@ class LibraryUpdateService(
         if (intent == null) return START_NOT_STICKY
         val target = intent.getSerializableExtra(KEY_TARGET) as? Target
             ?: return START_NOT_STICKY
+
+        val trigger = intent.getSerializableExtra(KEY_TRIGGER) as? Trigger
+            ?: return START_NOT_STICKY
+
+        // If this is a chapter update; set the last update time to now and trigger
+        if (target == Target.CHAPTERS) {
+            preferences.libraryUpdateLastTimestamp().set(Date().time)
+            preferences.libraryUpdateLastTrigger().set(trigger)
+        }
 
         instance = this
 

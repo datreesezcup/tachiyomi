@@ -116,7 +116,7 @@ class LibraryCategoryView @JvmOverloads constructor(context: Context, attrs: Att
         binding.swipeRefresh.setDistanceToTriggerSync((2 * 64 * resources.displayMetrics.density).toInt())
         binding.swipeRefresh.refreshes()
             .onEach {
-                if (LibraryUpdateService.start(context, category)) {
+                if (LibraryUpdateService.start(context, category, trigger = LibraryUpdateService.Trigger.MANUAL)) {
                     context.toast(R.string.updating_category)
                 }
 

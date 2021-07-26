@@ -9,6 +9,7 @@ import com.tfcporciuncula.flow.FlowSharedPreferences
 import com.tfcporciuncula.flow.Preference
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Manga
+import eu.kanade.tachiyomi.data.library.LibraryUpdateService.Trigger
 import eu.kanade.tachiyomi.data.preference.PreferenceValues.ThemeMode.*
 import eu.kanade.tachiyomi.data.track.TrackService
 import eu.kanade.tachiyomi.data.track.anilist.Anilist
@@ -231,6 +232,9 @@ class PreferencesHelper(val context: Context) {
 
     fun libraryUpdateCategories() = flowPrefs.getStringSet(Keys.libraryUpdateCategories, emptySet())
     fun libraryUpdateCategoriesExclude() = flowPrefs.getStringSet(Keys.libraryUpdateCategoriesExclude, emptySet())
+
+    fun libraryUpdateLastTimestamp() = flowPrefs.getLong(Keys.libraryUpdateLastTimestamp, 0L)
+    fun libraryUpdateLastTrigger() = flowPrefs.getEnum(Keys.libraryUpdateLastTrigger, Trigger.AUTOMATIC)
 
     fun libraryUpdatePrioritization() = flowPrefs.getInt(Keys.libraryUpdatePrioritization, 0)
 
