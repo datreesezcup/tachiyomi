@@ -133,7 +133,6 @@ object PreferenceKeys {
     const val libraryUpdateCategoriesExclude = "library_update_categories_exclude"
 
     const val libraryUpdateLastTimestamp = "library_update_last_timestamp"
-    const val libraryUpdateLastTrigger = "library_update_last_trigger"
 
     const val libraryUpdatePrioritization = "library_update_prioritization"
 

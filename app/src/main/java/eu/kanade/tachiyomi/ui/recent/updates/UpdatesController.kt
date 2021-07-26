@@ -150,7 +150,7 @@ class UpdatesController :
 
     private fun updateLibrary() {
         activity?.let {
-            if (LibraryUpdateService.start(it, trigger = LibraryUpdateService.Trigger.MANUAL)) {
+            if (LibraryUpdateService.start(it)) {
                 it.toast(R.string.updating_library)
             }
         }

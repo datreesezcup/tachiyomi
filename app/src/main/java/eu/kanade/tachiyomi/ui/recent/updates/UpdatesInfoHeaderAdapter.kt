@@ -11,7 +11,6 @@ import eu.kanade.tachiyomi.databinding.UpdatesLastinfoHeaderBinding
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.util.Date
-import eu.kanade.tachiyomi.data.library.LibraryUpdateService.Trigger as UpdateTrigger
 
 class UpdatesInfoHeaderAdapter() :
     RecyclerView.Adapter<UpdatesInfoHeaderAdapter.Holder>() {
@@ -45,12 +44,7 @@ class UpdatesInfoHeaderAdapter() :
             val lastUpdateTimestamp = preferences.libraryUpdateLastTimestamp().get()
             val lastUpdateTimeString = DateUtils.getRelativeTimeSpanString(lastUpdateTimestamp, now, DateUtils.MINUTE_IN_MILLIS)
 
-            val updateReason = when (preferences.libraryUpdateLastTrigger().get()) {
-                UpdateTrigger.AUTOMATIC -> R.string.update_trigger_automatic
-                UpdateTrigger.MANUAL -> R.string.update_trigger_manual
-            }.let(context::getString)
-
-            binding.title.text = context.getString(R.string.updates_last_update_info, lastUpdateTimeString, updateReason)
+            binding.title.text = context.getString(R.string.updates_last_update_info, lastUpdateTimeString)
         }
     }
 }

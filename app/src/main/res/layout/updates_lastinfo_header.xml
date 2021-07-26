@@ -11,7 +11,7 @@
         android:paddingTop="4dp"
         android:paddingHorizontal="16dp"
         android:gravity="center"
-        tools:text="Last Update: 2 Hours Ago (Manual)"
+        tools:text="Library last updated: 20 minutes ago"
         />
 
 </FrameLayout>

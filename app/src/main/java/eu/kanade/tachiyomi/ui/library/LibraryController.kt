@@ -427,7 +427,7 @@ class LibraryController(
             R.id.action_filter -> showSettingsSheet()
             R.id.action_update_library -> {
                 activity?.let {
-                    if (LibraryUpdateService.start(it, trigger = LibraryUpdateService.Trigger.MANUAL)) {
+                    if (LibraryUpdateService.start(it)) {
                         it.toast(R.string.updating_library)
                     }
                 }
