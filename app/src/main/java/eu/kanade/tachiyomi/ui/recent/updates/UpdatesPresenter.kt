@@ -101,6 +101,9 @@ class UpdatesPresenter(
                 }
                 setDownloadedChapters(list)
                 chapters = list
+
+                //Set unread chapter count for bottom bar badge
+                preferences.libraryUnreadUpdatesCount().set(list.count { !it.read })
             }
     }
 
