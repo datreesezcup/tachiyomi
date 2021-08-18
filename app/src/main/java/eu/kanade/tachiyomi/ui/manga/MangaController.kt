@@ -21,6 +21,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.imageLoader
@@ -62,6 +63,7 @@ import eu.kanade.tachiyomi.ui.library.ChangeMangaCoverDialog
 import eu.kanade.tachiyomi.ui.library.LibraryController
 import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.ui.manga.chapter.ChapterItem
+import eu.kanade.tachiyomi.ui.manga.chapter.ChapterItemTouchHelper
 import eu.kanade.tachiyomi.ui.manga.chapter.ChaptersAdapter
 import eu.kanade.tachiyomi.ui.manga.chapter.ChaptersSettingsSheet
 import eu.kanade.tachiyomi.ui.manga.chapter.DeleteChaptersDialog
@@ -104,6 +106,7 @@ class MangaController :
     ActionMode.Callback,
     FlexibleAdapter.OnItemClickListener,
     FlexibleAdapter.OnItemLongClickListener,
+    FlexibleAdapter.OnItemSwipeListener,
     BaseChaptersAdapter.OnChapterClickListener,
     ChangeMangaCoverDialog.Listener,
     ChangeMangaCategoriesDialog.Listener,
@@ -235,9 +238,13 @@ class MangaController :
         chaptersHeaderAdapter = MangaChaptersHeaderAdapter(this)
         chaptersAdapter = ChaptersAdapter(this, view.context)
 
+        val chapterItemTouchHelper = ItemTouchHelper(ChapterItemTouchHelper())
+
         // Phone layout
         binding.fullRecycler?.let {
             it.adapter = ConcatAdapter(mangaInfoAdapter, chaptersHeaderAdapter, chaptersAdapter)
+
+            chapterItemTouchHelper.attachToRecyclerView(it)
 
             it.scrollEvents()
                 .onEach { updateToolbarTitleAlpha() }
@@ -270,6 +277,7 @@ class MangaController :
         }
         binding.chaptersRecycler?.let {
             it.adapter = ConcatAdapter(chaptersHeaderAdapter, chaptersAdapter)
+            chapterItemTouchHelper.attachToRecyclerView(it)
         }
 
         chaptersAdapter?.fastScroller = binding.fastScroller
@@ -882,6 +890,25 @@ class MangaController :
             lastClickPositionStack.push(position)
         }
         chaptersAdapter?.notifyDataSetChanged()
+    }
+
+    override fun onActionStateChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+    }
+
+    override fun onItemSwipe(position: Int, direction: Int) {
+        val adapter = chaptersAdapter ?: return
+        val item = adapter.getItem(position) ?: return
+        if (direction == ItemTouchHelper.LEFT) {
+            if (item.read) {
+                markAsUnread(listOf(item))
+            } else {
+                markAsRead(listOf(item))
+            }
+        } else if (direction == ItemTouchHelper.RIGHT) {
+            bookmarkChapters(listOf(item), item.bookmark.not())
+        }
+
+        adapter.notifyItemChanged(position)
     }
 
     fun showSettingsSheet() {

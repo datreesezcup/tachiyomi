@@ -53,6 +53,12 @@ class ChapterHolder(
 
         binding.bookmarkIcon.isVisible = chapter.bookmark
 
+        val swipeReadIcon = if (chapter.read) R.drawable.ic_done_outline_24dp else R.drawable.ic_done_24dp
+        val swipeBookmarkIcon = if (chapter.bookmark) R.drawable.ic_bookmark_border_24dp else R.drawable.ic_bookmark_24dp
+
+        binding.readSwipeIcon.setImageResource(swipeReadIcon)
+        binding.bookmarkSwipeIcon.setImageResource(swipeBookmarkIcon)
+
         val descriptions = mutableListOf<CharSequence>()
 
         if (chapter.date_upload > 0) {
@@ -78,5 +84,17 @@ class ChapterHolder(
 
         binding.download.isVisible = item.manga.source != LocalSource.ID
         binding.download.setState(item.status, item.progress)
+    }
+
+    override fun getFrontView(): View {
+        return binding.chapterSwipeFrontView
+    }
+
+    override fun getRearRightView(): View {
+        return binding.chapterSwipeRightView
+    }
+
+    override fun getRearLeftView(): View {
+        return binding.chapterSwipeLeftView
     }
 }
