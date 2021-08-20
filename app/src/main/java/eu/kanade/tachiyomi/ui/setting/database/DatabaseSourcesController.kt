@@ -12,7 +12,6 @@ import dev.chrisbanes.insetter.applyInsetter
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.databinding.DatabaseSourcesControllerBinding
-import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.ui.base.controller.FabController
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
@@ -28,7 +27,7 @@ class DatabaseSourcesController :
 
     private var recycler: RecyclerView? = null
 
-    private var adapter: DatabaseSourceAdapter? = null
+    private var adapter: FlexibleAdapter<DatabaseSourceItem>? = null
 
     private var actionFab: ExtendedFloatingActionButton? = null
 
@@ -38,7 +37,8 @@ class DatabaseSourcesController :
         setHasOptionsMenu(true)
     }
 
-    val selectedSources: MutableSet<Source> = mutableSetOf()
+    private val selectedSources: List<DatabaseSourceItem>
+        get() = adapter?.selectedPositions?.mapNotNull(adapter!!::getItem) ?: emptyList()
 
     override fun getTitle(): String {
         return activity!!.getString(R.string.pref_clear_database)
@@ -53,7 +53,7 @@ class DatabaseSourcesController :
             }
         }
 
-        adapter = DatabaseSourceAdapter(this)
+        adapter = FlexibleAdapter<DatabaseSourceItem>(null, this, true)
         binding.recycler.layoutManager = LinearLayoutManager(view.context)
         binding.recycler.adapter = adapter
         actionFabScrollListener = binding.recycler.let { actionFab?.shrinkOnScroll(it) }
@@ -78,7 +78,7 @@ class DatabaseSourcesController :
     override fun onItemClick(view: View?, position: Int): Boolean {
         toggleSelection(position)
         adapter!!.notifyItemChanged(position)
-        return false
+        return true
     }
 
     override fun configureFab(fab: ExtendedFloatingActionButton) {
@@ -109,18 +109,18 @@ class DatabaseSourcesController :
 
         when (item.itemId) {
             R.id.action_select_all -> {
-                for (i in 0..adapter.itemCount) {
+                for (i in 0 until adapter.itemCount) {
                     addSelection(i)
                 }
             }
             R.id.action_select_inverse -> {
-                for (i in 0..adapter.itemCount) {
+                for (i in 0 until adapter.itemCount) {
                     toggleSelection(i)
                 }
             }
         }
 
-        adapter.notifyDataSetChanged()
+        adapter.notifyItemRangeChanged(0, adapter.itemCount)
         return super.onOptionsItemSelected(item)
     }
 
@@ -136,25 +136,17 @@ class DatabaseSourcesController :
         adapter?.updateDataSet(sources)
     }
 
-    fun addSelection(position: Int) {
+    private fun addSelection(position: Int) {
         val adapter = adapter ?: return
-        val source = adapter.getItem(position)?.source ?: return
         adapter.addSelection(position)
-        selectedSources.add(source)
         actionFab!!.isVisible = true
     }
 
     private fun toggleSelection(position: Int) {
         val adapter = adapter ?: return
-        val source = adapter.getItem(position)?.source ?: return
         adapter.toggleSelection(position)
-        if (adapter.isSelected(position)) {
-            selectedSources.add(source)
-        } else {
-            selectedSources.remove(source)
-        }
 
-        actionFab!!.isVisible = selectedSources.size > 0
+        actionFab!!.isVisible = adapter.selectedItemCount > 0
     }
 
     class ClearDatabaseSourcesDialog : DialogController() {
@@ -171,8 +163,7 @@ class DatabaseSourcesController :
     }
 
     private fun clearDatabaseForSources() {
-        presenter.clearDatabaseForSources(selectedSources.map { it.id })
-        selectedSources.clear()
+        presenter.clearDatabaseForSources(selectedSources.map { it.source.id })
         actionFab!!.isVisible = false
         adapter?.clearSelection()
         adapter?.notifyDataSetChanged()
