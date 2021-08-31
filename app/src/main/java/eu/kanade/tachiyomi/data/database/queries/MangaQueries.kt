@@ -48,11 +48,13 @@ interface MangaQueries : DbProvider {
             .prepare()
     }
 
-    fun getAllManga() = db.get()
+    fun getMangaNotInLibrary() = db.get()
         .listOfObjects(Manga::class.java)
         .withQuery(
             Query.builder()
                 .table(MangaTable.TABLE)
+                .where("${MangaTable.COL_FAVORITE} = ?")
+                .whereArgs(0)
                 .build()
         )
         .prepare()
