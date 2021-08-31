@@ -2,7 +2,12 @@ package eu.kanade.tachiyomi.ui.setting.database
 
 import android.app.Dialog
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,6 +37,8 @@ class DatabaseSourcesController :
     private var actionFab: ExtendedFloatingActionButton? = null
 
     private var actionFabScrollListener: RecyclerView.OnScrollListener? = null
+
+    private var menu: Menu? = null
 
     init {
         setHasOptionsMenu(true)
@@ -102,6 +109,7 @@ class DatabaseSourcesController :
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.generic_selection, menu)
+        this.menu = menu
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -129,6 +137,11 @@ class DatabaseSourcesController :
             binding.emptyView.hide()
         } else {
             binding.emptyView.show(R.string.database_clean_message)
+        }
+
+        menu?.apply {
+            get(0).isVisible = size > 0
+            get(1).isVisible = size > 0
         }
     }
 
