@@ -17,16 +17,15 @@ class DatabaseSourcesPresenter(
     override fun onCreate(savedState: Bundle?) {
         super.onCreate(savedState)
 
-        db.getAllManga()
+        db.getMangaNotInLibrary()
             .asRxObservable()
             .observeOn(AndroidSchedulers.mainThread())
-            .map(::findSourcesWithDatabaseEntries)
+            .map(::mangaToDatabaseSourceItems)
             .subscribeLatestCache(DatabaseSourcesController::setDatabaseSources)
     }
 
-    private fun findSourcesWithDatabaseEntries(manga: List<Manga>): List<DatabaseSourceItem> {
+    private fun mangaToDatabaseSourceItems(manga: List<Manga>): List<DatabaseSourceItem> {
         return manga
-            .filterNot { it.favorite }
             .groupBy { it.source }
             .map { (sourceID, mangaList) ->
                 val source = sourceManager.getOrStub(sourceID)
