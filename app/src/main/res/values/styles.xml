@@ -119,6 +119,15 @@
         <item name="android:verticalSpacing">0dp</item>
     </style>
 
+    <style name="Widget.Tachiyomi.Slider" parent="Widget.MaterialComponents.Slider">
+        <item name="labelStyle">@style/Widget.Tachiyomi.Tooltip</item>
+    </style>
+
+    <style name="Widget.Tachiyomi.Tooltip" parent="Widget.MaterialComponents.Tooltip">
+        <item name="backgroundTint">?attr/colorSecondary</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
 
     <style name="Widget.Tachiyomi.SpinnerItem" parent="Widget.AppCompat.DropDownItem.Spinner">
         <item name="android:textColor">?attr/colorOnSurface</item>
