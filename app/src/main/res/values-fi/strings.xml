@@ -71,7 +71,6 @@
     <string name="download_notifier_no_network">Ei verkkoyhteyttä</string>
     <string name="download_notifier_download_paused">Lataus pysäytetty</string>
     <string name="channel_common">Tavallinen</string>
-    <string name="channel_library">Kirjasto</string>
     <string name="label_backup">Varmuuskopiointi ja palautus</string>
     <string name="label_migration">Siirrä</string>
     <string name="label_extensions">Laajennukset</string>
@@ -126,7 +125,6 @@
     <string name="pref_library_columns">Kohteita per rivi</string>
     <string name="portrait">Pystysuunta</string>
     <string name="landscape">Vaakataso</string>
-    <string name="default_columns">Oletus</string>
     <string name="pref_library_update_interval">Päivitystiheys</string>
     <string name="update_never">Manuaalinen</string>
     <string name="update_3hour">Kolmen tunnin välein</string>
@@ -141,8 +139,6 @@
     <string name="pref_update_only_non_completed">Päivitä vain jatkuvat sarjat</string>
     <string name="pref_auto_update_manga_sync">Päivitä luvun edistyminen lukemisen jälkeen</string>
     <string name="pref_start_screen">Aloitusnäyttö</string>
-    <string name="pref_language">Kieli</string>
-    <string name="system_default">Oletus</string>
     <string name="default_category">Oletus kategoria</string>
     <string name="default_category_summary">Kysy aina</string>
     <string name="all_lang">Kaikki</string>
@@ -184,7 +180,6 @@
     <string name="white_background">Valkoinen</string>
     <string name="black_background">Musta</string>
     <string name="pref_viewer_type">Oletuslukutila</string>
-    <string name="default_viewer">Oletus</string>
     <string name="left_to_right_viewer">Vasemmalta oikealle</string>
     <string name="right_to_left_viewer">Oikealta vasemmalle</string>
     <string name="vertical_viewer">Pystysuora</string>
@@ -324,7 +319,6 @@
     <string name="snack_add_to_library">Lisää sarja kirjastoon\?</string>
     <string name="picture_saved">Kuva tallennetu</string>
     <string name="pref_color_filter_mode">Värisuodattimen sekoitus tyyppi</string>
-    <string name="filter_mode_default">Tavallinen</string>
     <string name="filter_mode_overlay">Päällys</string>
     <string name="filter_mode_multiply">Monistettu</string>
     <string name="filter_mode_screen">Näyttö</string>
@@ -357,10 +351,6 @@
     <string name="theme_light">Pois päältä</string>
     <string name="theme_dark">Päällä</string>
     <string name="theme_system">Seuraa järjestelmää</string>
-    <string name="pref_theme_dark">Tumma teema</string>
-    <string name="theme_dark_default">Oletus</string>
-    <string name="theme_dark_blue">Tummansininen</string>
-    <string name="theme_dark_amoled">AMOLED teema</string>
     <string name="pref_manage_notifications">Hallitse ilmoituksia</string>
     <string name="pref_category_security">Turvallisuus</string>
     <string name="lock_with_biometrics">Vaadi lukituksen avaaminen</string>
@@ -402,9 +392,6 @@
         <item quantity="one">Yhdelle sarjalle</item>
         <item quantity="other">%d sarjalle</item>
     </plurals>
-    <string name="pref_theme_light">Vaalea teema</string>
-    <string name="theme_light_default">Oletus</string>
-    <string name="theme_light_blue">Vaaleansininen</string>
     <string name="action_menu">Valikko</string>
     <string name="action_reorganize_by">Uudelleenjärjestä</string>
     <string name="action_newest">Uusin</string>
@@ -492,7 +479,6 @@
     <string name="invalid_backup_file">Virheellinen varmuuskopio</string>
     <string name="tracker_not_logged_in">Et ole kirjautunut sisään: %1$s</string>
     <string name="source_not_found_name">Lähdettä ei löytynyt: %1$s</string>
-    <string name="pref_library_update_error_notification">Näytä päivitysvirheilmoitukset</string>
     <string name="pref_library_update_refresh_metadata_summary">Tarkista uusi kansi ja tiedot päivitettäessä kirjastoa</string>
     <string name="pref_library_update_refresh_metadata">Päivitä metatiedot automaattisesti</string>
     <string name="action_migrate">Siirrä</string>
@@ -512,7 +498,6 @@
         <item quantity="one">1 luku</item>
         <item quantity="other">%1$s lukua</item>
     </plurals>
-    <string name="action_open_in_settings">Avaa Asetuksissa</string>
     <string name="requires_app_restart">Edellyttää sovelluksen käynnisstämisen uudelleen</string>
     <string name="label_network">Verkko</string>
     <string name="pref_jump_to_chapters">Siirry lukuihin avatessa</string>
@@ -529,7 +514,6 @@
     <string name="download_insufficient_space">Lukuja ei voitu ladata vähäisen tallennustilan vuoksi</string>
     <string name="action_global_search_query">Etsi \"%1$s\" globaalisesti</string>
     <string name="pref_category_reading_mode">Lukutila</string>
-    <string name="pref_category_locale">Paikallinen</string>
     <string name="pref_category_theme">Teema</string>
     <string name="action_sort_date_added">Lisäyspäivämäärä</string>
     <plurals name="num_trackers">
@@ -537,8 +521,6 @@
         <item quantity="other">%d seurantapalvelinta</item>
     </plurals>
     <string name="no_pinned_sources">Sinulla ei ole kiinnitettyjä lähteitä</string>
-    <string name="group_backup_restore">Varmuuskopiointi ja palautus</string>
-    <string name="group_downloader">Lataukset</string>
     <string name="channel_complete">Valmis</string>
     <string name="channel_progress">Edistyminen</string>
     <string name="download_notifier_download_finish">Lataus valmis</string>
@@ -575,8 +557,6 @@
     <string name="invalid_backup_file_type">Virheellinen varmuuskopiotiedosto: %1$s
 \nSen pitäisi päättyä .proto.gz or .json.</string>
     <string name="pref_category_nsfw_content">NSFW (18+) lähteet</string>
-    <string name="pref_label_nsfw_extension">Laajennusluettelon otsikko</string>
-    <string name="pref_show_nsfw_extension">Näytä laajennusluettelossa</string>
     <string name="pref_show_nsfw_source">Näytä lähdeluettelossa</string>
     <string name="file_picker_error">Tiedostonvalitsinsovellusta ei löytynyt</string>
     <string name="myanimelist_relogin">Kirjaudu uudelleen MAL: iin</string>
@@ -584,7 +564,6 @@
     <string name="edge_nav">Reuna</string>
     <string name="kindlish_nav">Kindle tyylinen</string>
     <string name="l_nav">L-muotoinen</string>
-    <string name="default_nav">Oletus</string>
     <string name="pref_dump_crash_logs">Poista kaatumislokit</string>
     <string name="channel_crash_logs">Kaatumislokit</string>
     <string name="track_finished_reading_date">Lopetuspäivämäärä</string>
@@ -630,7 +609,6 @@
     <string name="pref_create_folder_per_manga">Tallenna sivut erillisiin kansioihin</string>
     <string name="pref_reader_actions">Toiminnot</string>
     <string name="rotation_type">Kierron tyyppi</string>
-    <string name="default_rotation_type">Oletus</string>
     <string name="pref_grayscale">Harmaasävy</string>
     <string name="notification_incognito_text">Poista incognito-tila käytöstä</string>
     <string name="automatic_background">Automaattinen</string>
@@ -638,14 +616,9 @@
     <string name="error_no_match">Yhtään osumaa ei löytynyt</string>
     <string name="source_unsupported">Lähdettä ei tueta</string>
     <string name="unread">Lukemattomat</string>
-    <string name="pref_auto_add_track">Seuraa hiljaa, kun lisäät mangaa kirjastoon</string>
-    <string name="theme_dark_midnightdusk">Midnight Dusk</string>
-    <string name="theme_light_strawberrydaiquiri">Mansikka Daiquiri</string>
     <string name="local_invalid_format">Väärä lukuformaatti</string>
     <string name="chapter_not_found">Lukua ei löytynyt</string>
     <string name="restrictions">Rajoitukset: %s</string>
-    <string name="theme_dark_amoled_hotpink">AMOLED kuuma pinkki</string>
-    <string name="theme_dark_greenapple">Vihreä omena</string>
     <string name="date">Päivämäärä</string>
     <string name="off">Pois päältä</string>
     <string name="on">Päällä</string>

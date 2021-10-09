@@ -11,6 +11,8 @@ import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.track.TrackManager
+import eu.kanade.tachiyomi.data.track.job.DelayedTrackingStore
+import eu.kanade.tachiyomi.data.track.job.DelayedTrackingUpdateJob
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.source.model.Page
@@ -31,14 +33,16 @@ import eu.kanade.tachiyomi.util.storage.DiskUtil
 import eu.kanade.tachiyomi.util.storage.getPicturesDir
 import eu.kanade.tachiyomi.util.storage.getTempShareDir
 import eu.kanade.tachiyomi.util.system.ImageUtil
+import eu.kanade.tachiyomi.util.system.isOnline
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.updateCoverLastModified
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import logcat.LogPriority
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import timber.log.Timber
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -53,7 +57,8 @@ class ReaderPresenter(
     private val sourceManager: SourceManager = Injekt.get(),
     private val downloadManager: DownloadManager = Injekt.get(),
     private val coverCache: CoverCache = Injekt.get(),
-    private val preferences: PreferencesHelper = Injekt.get()
+    private val preferences: PreferencesHelper = Injekt.get(),
+    private val delayedTrackingStore: DelayedTrackingStore = Injekt.get(),
 ) : BasePresenter<ReaderActivity>() {
 
     /**
@@ -297,7 +302,7 @@ class ReaderPresenter(
     private fun loadNewChapter(chapter: ReaderChapter) {
         val loader = loader ?: return
 
-        Timber.d("Loading ${chapter.chapter.url}")
+        logcat { "Loading ${chapter.chapter.url}" }
 
         activeChapterSubscription?.unsubscribe()
         activeChapterSubscription = getLoadObservable(loader, chapter)
@@ -315,7 +320,7 @@ class ReaderPresenter(
     private fun loadAdjacent(chapter: ReaderChapter) {
         val loader = loader ?: return
 
-        Timber.d("Loading adjacent ${chapter.chapter.url}")
+        logcat { "Loading adjacent ${chapter.chapter.url}" }
 
         activeChapterSubscription?.unsubscribe()
         activeChapterSubscription = getLoadObservable(loader, chapter)
@@ -340,7 +345,7 @@ class ReaderPresenter(
             return
         }
 
-        Timber.d("Preloading ${chapter.chapter.url}")
+        logcat { "Preloading ${chapter.chapter.url}" }
 
         val loader = loader ?: return
 
@@ -379,7 +384,7 @@ class ReaderPresenter(
         }
 
         if (selectedChapter != currentChapters.currChapter) {
-            Timber.d("Setting ${selectedChapter.chapter.url} as active")
+            logcat { "Setting ${selectedChapter.chapter.url} as active" }
             onChapterChanged(currentChapters.currChapter)
             loadNewChapter(selectedChapter)
         }
@@ -405,6 +410,7 @@ class ReaderPresenter(
         val currentChapterPosition = chapterList.indexOf(currentChapter)
         val removeAfterReadSlots = preferences.removeAfterReadSlots()
         val chapterToDelete = chapterList.getOrNull(currentChapterPosition - removeAfterReadSlots)
+
         // Check if deleting option is enabled and chapter exists
         if (removeAfterReadSlots != -1 && chapterToDelete != null) {
             enqueueDeleteReadChapters(chapterToDelete)
@@ -544,7 +550,7 @@ class ReaderPresenter(
         manga.orientationType = rotationType
         db.updateViewerFlags(manga).executeAsBlocking()
 
-        Timber.i("Manga orientation is ${manga.orientationType}")
+        logcat(LogPriority.INFO) { "Manga orientation is ${manga.orientationType}" }
 
         Observable.timer(250, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
             .subscribeFirst({ view, _ ->
@@ -698,9 +704,10 @@ class ReaderPresenter(
         if (!preferences.autoUpdateTrack()) return
         val manga = manga ?: return
 
-        val chapterRead = readerChapter.chapter.chapter_number.toInt()
+        val chapterRead = readerChapter.chapter.chapter_number
 
         val trackManager = Injekt.get<TrackManager>()
+        val context = Injekt.get<Application>()
 
         launchIO {
             db.getTracks(manga).executeAsBlocking()
@@ -713,8 +720,13 @@ class ReaderPresenter(
                         // for a while. The view can still be garbage collected.
                         async {
                             runCatching {
-                                service.update(track, true)
-                                db.insertTrack(track).executeAsBlocking()
+                                if (context.isOnline()) {
+                                    service.update(track, true)
+                                    db.insertTrack(track).executeAsBlocking()
+                                } else {
+                                    delayedTrackingStore.addItem(track)
+                                    DelayedTrackingUpdateJob.setupTask(context)
+                                }
                             }
                         }
                     } else {
@@ -723,7 +735,7 @@ class ReaderPresenter(
                 }
                 .awaitAll()
                 .mapNotNull { it.exceptionOrNull() }
-                .forEach { Timber.w(it) }
+                .forEach { logcat(LogPriority.INFO, it) }
         }
     }
 

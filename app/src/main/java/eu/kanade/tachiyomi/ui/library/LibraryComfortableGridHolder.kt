@@ -4,11 +4,10 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import coil.clear
-import coil.loadAny
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.items.IFlexible
 import eu.kanade.tachiyomi.databinding.SourceComfortableGridItemBinding
-import eu.kanade.tachiyomi.util.isLocal
+import eu.kanade.tachiyomi.util.view.loadAnyAutoPause
 
 /**
  * Class used to hold the displayed data of a manga in the library, like the cover or the title.
@@ -37,7 +36,8 @@ class LibraryComfortableGridHolder(
         binding.title.text = item.manga.title
 
         // For rounded corners
-        binding.badges.clipToOutline = true
+        binding.leftBadges.clipToOutline = true
+        binding.rightBadges.clipToOutline = true
 
         // Update the unread count and its visibility.
         with(binding.unreadText) {
@@ -49,6 +49,11 @@ class LibraryComfortableGridHolder(
             isVisible = item.downloadCount > 0
             text = item.downloadCount.toString()
         }
+        // Update the source language and its visibility
+        with(binding.languageText) {
+            isVisible = item.sourceLanguage.isNotEmpty()
+            text = item.sourceLanguage
+        }
         // set local visibility if its local manga
         binding.localText.isVisible = item.isLocal
 
@@ -57,6 +62,6 @@ class LibraryComfortableGridHolder(
 
         // Update the cover.
         binding.thumbnail.clear()
-        binding.thumbnail.loadAny(item.manga)
+        binding.thumbnail.loadAnyAutoPause(item.manga)
     }
 }

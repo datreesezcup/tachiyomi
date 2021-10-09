@@ -65,7 +65,6 @@
     <string name="pref_category_tracking">Tracking</string>
     <string name="pref_category_advanced">Geavanceerd</string>
     <string name="pref_library_columns">Elementen per rij</string>
-    <string name="default_columns">Standaard</string>
     <string name="pref_library_update_interval">Updatefrequentie</string>
     <string name="update_never">Handmatig</string>
     <string name="update_3hour">Iedere 3 uur</string>
@@ -76,8 +75,6 @@
     <string name="update_weekly">Wekelijks</string>
     <string name="all">Alles</string>
     <string name="pref_start_screen">Beginscherm</string>
-    <string name="pref_language">Taal</string>
-    <string name="system_default">Standaard</string>
     <string name="default_category">Standaard categorie</string>
     <string name="default_category_summary">Altijd vragen</string>
     <string name="pref_fullscreen">Volledig scherm</string>
@@ -92,7 +89,6 @@
     <string name="white_background">Wit</string>
     <string name="black_background">Zwart</string>
     <string name="pref_viewer_type">Standaard leesmodus</string>
-    <string name="default_viewer">Standaard</string>
     <string name="left_to_right_viewer">Links naar rechts</string>
     <string name="right_to_left_viewer">Rechts naar links</string>
     <string name="vertical_viewer">Verticaal</string>
@@ -196,7 +192,7 @@
     <string name="description_cover">Omslag van de manga</string>
     <string name="information_no_downloads">Geen downloads</string>
     <string name="information_no_recent">Geen recente updates</string>
-    <string name="information_empty_library">Je bibliotheek is leeg. Voeg series toe aan je bibliotheek via Bladeren.</string>
+    <string name="information_empty_library">Je bibliotheek is leeg</string>
     <string name="information_empty_category">Er zijn nog geen categorieën. Druk op de plus-knop om er een aan te maken.</string>
     <string name="download_notifier_downloader_title">Downloader</string>
     <string name="download_notifier_title_error">Fout</string>
@@ -217,8 +213,8 @@
     <string name="pref_zoom_start">Zoom startpositie</string>
     <string name="rotation_force_portrait">Vergrendeld staand</string>
     <string name="rotation_force_landscape">Vergrendeld liggend</string>
-    <string name="pref_remove_after_marked_as_read">Nadat ze handmatig gemarkeerd zijn als gelezen</string>
-    <string name="pref_remove_after_read">Na het lezen</string>
+    <string name="pref_remove_after_marked_as_read">Nadat ze gemarkeerd zijn als gelezen</string>
+    <string name="pref_remove_after_read">Automatisch na het lezen</string>
     <string name="disabled">Uitgeschakeld</string>
     <string name="fourth_to_last">Drie-na-laatste hoofdstuk</string>
     <string name="fifth_to_last">Vier-na-laatste hoofdstuk</string>
@@ -234,7 +230,7 @@
     <string name="download_notifier_unknown_error">Kon dit hoofdstuk niet downloaden door een onverwachte fout</string>
     <string name="pref_library_update_restriction">Updatebeperkingen</string>
     <string name="pref_update_only_non_completed">Update alleen lopende manga</string>
-    <string name="pref_auto_update_manga_sync">Hoofdstukvoortgang bijwerken na lezen</string>
+    <string name="pref_auto_update_manga_sync">Voortgang bijwerken na lezen</string>
     <string name="pref_lock_orientation">Scherm niet draaien</string>
     <string name="pref_keep_screen_on">Scherm aanhouden</string>
     <string name="clear_database_confirmation">Weet je het zeker\? Gelezen hoofdstukken en voortgang voor manga die niet in de bibliotheek zitten zullen verloren gaan</string>
@@ -265,7 +261,6 @@
     <string name="other_source">Anders</string>
     <string name="action_global_search_hint">Globaal zoeken…</string>
     <string name="latest">Nieuwste</string>
-    <string name="channel_library">Bibliotheek</string>
     <string name="browse">Bladeren</string>
     <string name="channel_common">Algemeen</string>
     <string name="label_migration">Migreren</string>
@@ -320,7 +315,6 @@
     <string name="migration_dialog_what_to_include">Selecteer data om mee te nemen</string>
     <string name="migrate">Migreren</string>
     <string name="copy">Kopiëren</string>
-    <string name="filter_mode_default">Standaard</string>
     <string name="action_open_in_web_view">Openen in WebView</string>
     <string name="pref_true_color">32-bits kleuren</string>
     <string name="pref_skip_read_chapters">Gelezen hoofdstukken overslaan</string>
@@ -357,7 +351,6 @@
     <string name="theme_light">Uit</string>
     <string name="theme_dark">Aan</string>
     <string name="theme_system">Volg systeeminstelling</string>
-    <string name="theme_darkblue">Donkerblauw</string>
     <string name="pref_manage_notifications">Meldingen beheren</string>
     <string name="pref_category_security">Beveiliging</string>
     <string name="lock_with_biometrics">Ontgrendelen vereisen</string>
@@ -452,7 +445,6 @@
     <string name="pref_enable_automatic_extension_updates">Zoeken naar updates voor extensies</string>
     <string name="hide_notification_content">Meldingsinhoud verbergen</string>
     <string name="pref_confirm_exit">Bevestig sluiten</string>
-    <string name="theme_default">Standaard</string>
     <string name="action_move_to_top">Verplaats naar top</string>
     <string name="action_unpin">Lospinnen</string>
     <string name="viewer">Leesmodus</string>
@@ -494,7 +486,6 @@
     <string name="source_not_found_name">Bron niet gevonden: %1$s</string>
     <string name="pref_show_reading_mode_summary">Laat huidige modus kort zien als lezer geopend wordt</string>
     <string name="pref_show_reading_mode">Toon leesmodus</string>
-    <string name="pref_library_update_error_notification">Geef updatefoutmeldingen weer</string>
     <string name="pref_library_update_refresh_metadata">Metadata automatisch bijwerken</string>
     <string name="action_disable">Uitzetten</string>
     <string name="action_display_show_tabs">Toon categorietabbladen</string>
@@ -507,7 +498,6 @@
         <item quantity="one">1 hoofdstuk</item>
         <item quantity="other">%1$s hoofdstukken</item>
     </plurals>
-    <string name="action_open_in_settings">In Instellingen openen</string>
     <string name="requires_app_restart">Herstart van de app nodig om van kracht te worden</string>
     <string name="label_network">Netwerk</string>
     <string name="pref_jump_to_chapters">Ga naar de hoofdstukken bij openen</string>
@@ -523,7 +513,6 @@
     <string name="updated_version">Bijgewerkt naar v%1$s</string>
     <string name="whats_new">Wat is er nieuw</string>
     <string name="pref_category_reading_mode">Leesmodus</string>
-    <string name="pref_category_locale">Landinstelling</string>
     <string name="pref_category_theme">Thema</string>
     <string name="action_download_unread">Ongelezen hoofdstukken downloaden</string>
     <string name="action_sort_date_added">Datum toegevoegd</string>
@@ -532,14 +521,12 @@
         <item quantity="other">%d trackers</item>
     </plurals>
     <string name="no_pinned_sources">Je hebt geen vastgepinde bronnen</string>
-    <string name="group_backup_restore">Back-up en herstel</string>
-    <string name="group_downloader">Downloads</string>
     <string name="channel_complete">Voltooid</string>
     <string name="channel_progress">Voortgang</string>
     <string name="download_notifier_download_finish">Download voltooid</string>
     <string name="channel_errors">Fouten</string>
     <string name="backup_restore_missing_trackers">Niet-ingelogde trackers:</string>
-    <string name="pref_remove_bookmarked_chapters">Verwijder hoofdstukken met bladwijzers</string>
+    <string name="pref_remove_bookmarked_chapters">Verwijderen van hoofdstukken met bladwijzers toestaan</string>
     <string name="pref_category_delete_chapters">Hoofdstukken verwijderen</string>
     <string name="ext_nsfw_warning">Kan NSFW-inhoud (18+) bevatten</string>
     <string name="ext_nsfw_short">18+</string>
@@ -572,14 +559,11 @@
     <string name="pref_category_nsfw_content">NSFW-bronnen (18+)</string>
     <string name="file_picker_error">Geen bestandskiezer-app gevonden</string>
     <string name="myanimelist_relogin">Log alstublieft opnieuw in op MAL</string>
-    <string name="pref_label_nsfw_extension">Markeren in extensielijst</string>
-    <string name="pref_show_nsfw_extension">Weergeven in extensielijst</string>
-    <string name="pref_show_nsfw_source">Weergeven in bronnenlijst</string>
+    <string name="pref_show_nsfw_source">Weergeven in bronnen- en extensielijst</string>
     <string name="pref_viewer_nav">Navigatie-indeling</string>
     <string name="edge_nav">Rand</string>
     <string name="kindlish_nav">Kindle-achtig</string>
     <string name="l_nav">L-vormig</string>
-    <string name="default_nav">Standaard</string>
     <string name="channel_crash_logs">Crashlogboeken</string>
     <string name="track_finished_reading_date">Einddatum</string>
     <string name="track_started_reading_date">Begindatum</string>
@@ -623,7 +607,6 @@
     <string name="rotation_landscape">Liggend</string>
     <string name="rotation_portrait">Staand</string>
     <string name="rotation_type">Draaitype</string>
-    <string name="default_rotation_type">Standaard</string>
     <string name="automatic_background">Automatisch</string>
     <string name="pref_create_folder_per_manga_summary">Mappen aanmaken op basis van mangatitel</string>
     <string name="pref_create_folder_per_manga">Pagina\'s opslaan in aparte mappen</string>
@@ -642,7 +625,6 @@
     <string name="cover_saved">Omslag opgeslagen</string>
     <string name="manga_cover">Omslag</string>
     <string name="local_invalid_format">Ongeldig hoofstukkenformaat</string>
-    <string name="pref_auto_add_track">Automatisch tracken wanneer nieuwe manga wordt toegevoegd aan de bibliotheek</string>
     <string name="tracking_guide">Trackinghandleiding</string>
     <string name="off">Uit</string>
     <string name="on">Aan</string>
@@ -653,13 +635,52 @@
     <string name="alignment_center">Midden</string>
     <string name="alignment_top">Bovenkant</string>
     <string name="pref_side_nav_icon_alignment">Uitlijning zijnavigatiepictogram</string>
-    <string name="theme_dark_amoled_hotpink">AMOLED Felroze</string>
-    <string name="theme_dark_midnightdusk">Nachtschemering</string>
-    <string name="theme_light_strawberrydaiquiri">Aardbeien Daiquiri</string>
-    <string name="theme_dark_greenapple">Groene Appel</string>
     <string name="action_display_local_badge">Lokale badges</string>
     <string name="information_empty_category_dialog">Er zijn nog geen categorieën.</string>
-    <string name="theme_light_yotsuba">Yotsuba</string>
     <string name="action_start_downloading_now">Begin nu met downloaden</string>
     <string name="action_sort_next_updated">Volgende verwachte update</string>
+    <string name="notification_updating">Bibliotheek updaten... (%1$d/%2$d)</string>
+    <string name="about_dont_kill_my_app">Sommige fabrikanten hebben extra beperkingen op apps die achtergronddiensten uitschakelen. Informatie over hoe je dit kan oplossen kan je vinden op de deze website.</string>
+    <string name="restore_miui_warning">Backup/herstellen werkt waarschijnlijk niet goed als de MIUI Optimalisatie is uitgeschakeld.</string>
+    <string name="pref_dark_theme_pure_black">Puur-zwarte donkere modus</string>
+    <string name="theme_yotsuba">Yotsuba</string>
+    <string name="theme_yinyang">Yin &amp; Yang</string>
+    <string name="theme_tako">Tako</string>
+    <string name="theme_strawberrydaiquiri">Aardbeien Daiquiri</string>
+    <string name="theme_midnightdusk">Nachtschemering</string>
+    <string name="theme_greenapple">Groene Appel</string>
+    <string name="theme_blue">Legacy Blauw</string>
+    <string name="pref_app_theme">Appthema</string>
+    <string name="tracker_komga_warning">Deze tracker werkt alleen met de Komga-bron.</string>
+    <string name="enhanced_tracking_info">Diensten die uitgebreidere functionaliteit bieden voor bepaalde bronnen. Het tracken van manga gebeurt automatisch wanneer je deze toevoegt aan je bibliotheek.</string>
+    <string name="enhanced_services">Verbeterde diensten</string>
+    <string name="theme_monet">Dynamisch</string>
+    <string name="getting_started_guide">Gids voor beginners</string>
+    <string name="help_translate">Help met vertalen</string>
+    <string name="pref_tablet_ui_mode">Forceer tablet UI</string>
+    <string name="label_background_activity">Achtergrond activiteit</string>
+    <string name="action_track">Volg</string>
+    <string name="pref_remove_exclude_categories">Uitgesloten categoriën</string>
+    <string name="pref_lowest">Laagste</string>
+    <string name="pref_low">Laag</string>
+    <string name="pref_high">Hoog</string>
+    <string name="pref_highest">Hoogste</string>
+    <string name="pref_hide_threshold">Menu automatisch verbergen bij scrollgevoeligheid</string>
+    <string name="pref_inverted_colors">Omgekeerd</string>
+    <plurals name="relative_time">
+        <item quantity="one">Gisteren</item>
+        <item quantity="other">%1$d dagen geleden</item>
+    </plurals>
+    <string name="relative_time_today">Vandaag</string>
+    <string name="recently">Recent</string>
+    <string name="pref_relative_time_long">Lang (Kort+, n dagen geleden)</string>
+    <string name="pref_relative_time_short">Kort (vandaag, gisteren)</string>
+    <string name="pref_relative_format">Relatieve tijdstempel</string>
+    <string name="pref_category_timestamps">Tijdstempel</string>
+    <string name="pref_category_navigation">Navigatie</string>
+    <string name="theme_tealturquoise">Blauwgroen &amp; Turkoois</string>
+    <string name="pref_category_appearance">Uiterlijk</string>
+    <string name="confirm_lock_change">Authenticeer om de wijziging te bevestigen</string>
+    <string name="label_default">Standaard</string>
+    <string name="ext_app_info">App-informatie</string>
 </resources>

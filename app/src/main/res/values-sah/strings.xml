@@ -61,7 +61,6 @@
     </plurals>
     <string name="default_category_summary">Наар ыйыт</string>
     <string name="default_category">Куолутунан бөлөх</string>
-    <string name="pref_library_update_error_notification">Саҥардыы сыаһатын туһунан биллэриилэри көрдөр</string>
     <string name="pref_library_update_refresh_metadata_summary">Саҥа тас уонна кыра чаастар баалларын, бэрэбиэркэлээ</string>
     <string name="pref_library_update_refresh_metadata">Метаданнайдары автоматическайдык саҥарт</string>
     <string name="pref_update_only_non_completed">Бүтэ илик маанганы эрэ, саҥарт</string>
@@ -78,7 +77,6 @@
     <string name="pref_library_update_interval">Саҥардыы түргэнэ</string>
     <string name="pref_category_library_update">Улахан саҥардыы</string>
     <string name="pref_jump_to_chapters">Аһаҕас түһүмэххэ көһүү</string>
-    <string name="default_columns">Куолутунан</string>
     <string name="landscape">Сытыары</string>
     <string name="portrait">Туруору</string>
     <string name="pref_library_columns">Маллары кэккэ туруор</string>
@@ -97,16 +95,11 @@
     <string name="pref_manage_notifications">Биллэриилэри салай</string>
     <string name="pref_confirm_exit">Тахсыыны бигэргэт</string>
     <string name="pref_date_format">Даататын формаата</string>
-    <string name="system_default">Куолутунан</string>
-    <string name="pref_language">Тыл</string>
     <string name="pref_start_screen">Сүрүн экран</string>
-    <string name="theme_darkblue">Хараҥа күөх</string>
-    <string name="theme_default">Куолутунан</string>
     <string name="theme_dark">Холбоммут</string>
     <string name="theme_light">Араарыллыбыт</string>
     <string name="theme_system">Системнайы тутуһуҥ</string>
     <string name="pref_theme_mode">Хараҥа тиэмэ</string>
-    <string name="pref_category_locale">Миэстэтэ</string>
     <string name="pref_category_theme">Тиэмэ</string>
     <string name="pref_category_about">Эбии туһунан</string>
     <string name="pref_category_advanced">Эбии</string>
@@ -148,7 +141,6 @@
     <string name="action_display">Көрдөр</string>
     <string name="action_display_mode">Көрүнүн уларыт</string>
     <string name="action_migrate">Көһүү</string>
-    <string name="action_open_in_settings">Түстэлгэ арый</string>
     <string name="action_open_in_web_view">WebViewга арый</string>
     <string name="action_open_in_browser">Көрдөөһүнҥэ арый</string>
     <string name="action_resume">Салҕаа</string>
@@ -205,7 +197,6 @@
     <string name="vertical_viewer">Туруору</string>
     <string name="right_to_left_viewer">Хаҥас диэки</string>
     <string name="left_to_right_viewer">Уҥа диэки</string>
-    <string name="default_viewer">Куолутунан</string>
     <string name="pref_viewer_type">Куолутунан ааҕар эрэһиим</string>
     <string name="black_background">Хара</string>
     <string name="gray_background">Бороҥ</string>
@@ -226,7 +217,6 @@
     <string name="filter_mode_overlay">Сабыы</string>
     <string name="pref_show_reading_mode_summary">Ааҕаччы холбонон турдаҕына, билиҥҥи эрэһиими кылгастык көрдөр</string>
     <string name="pref_show_reading_mode">Ааҕыы эрэһиимин көрдөр</string>
-    <string name="filter_mode_default">Куолутунан</string>
     <string name="pref_color_filter_mode">Өҥ биилтирэни олордор эрэһиим</string>
     <string name="pref_custom_color_filter">Туттааччы өҥ биилтирэ</string>
     <string name="pref_custom_brightness">Туттааччы сырдыга</string>
@@ -331,7 +321,6 @@
     <string name="pref_disable_battery_optimization_summary">Бэбэлэтиэкэ уонна хаппаас куопуйатыгар кэннинээҕи саҥардыытыгар көмөлөһөр</string>
     <string name="battery_optimization_setting_activity_not_found">Устройства түстэлэ сатаан арыллыбата</string>
     <string name="battery_optimization_disabled">Батарея тупсуруута араарыллынна</string>
-    <string name="group_backup_restore">Хаппаас куопуйаны оҥоруу уонна төнүҥнэрии</string>
     <string name="file_select_backup">Хаппаас куопуйа билэтин талыы</string>
     <string name="whats_new">Туох саҥа баарый</string>
     <string name="version">Биэрсия</string>
@@ -503,9 +492,6 @@
     <string name="edge_nav">Кытыы</string>
     <string name="kindlish_nav">Kindle курдук</string>
     <string name="l_nav">L курдук</string>
-    <string name="default_nav">Куолутунан</string>
-    <string name="pref_label_nsfw_extension">Кэҥэтиилэр испииһиктэригэр бэлиэ</string>
-    <string name="pref_show_nsfw_extension">Кэҥэтиилэр испииһэктэригэр көрдөрүү</string>
     <string name="pref_show_nsfw_source">Төрүттэр испииһэктэригэр көрдөрүү</string>
     <string name="pref_category_nsfw_content">NSFW (18+) төрүттэр</string>
     <string name="exclude">Киллэримэ: %s</string>

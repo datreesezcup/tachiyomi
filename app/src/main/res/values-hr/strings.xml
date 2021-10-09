@@ -51,7 +51,6 @@
     <string name="update_never">Ručno</string>
     <string name="pref_library_update_interval">Učestalost ažuriranja</string>
     <string name="pref_category_library_update">Globalno ažuriranje</string>
-    <string name="default_columns">Standardno</string>
     <string name="landscape">Ležeći format</string>
     <string name="portrait">Uspravni format</string>
     <string name="pref_library_columns">Broj elemenata po retku</string>
@@ -65,16 +64,7 @@
     <string name="pref_manage_notifications">Upravljaj obavijestima</string>
     <string name="pref_confirm_exit">Potvrdi zatvaranje programa</string>
     <string name="pref_date_format">Format datuma</string>
-    <string name="system_default">Standardno</string>
-    <string name="pref_language">Jezik</string>
     <string name="pref_start_screen">Početni ekran</string>
-    <string name="theme_dark_amoled">AMOLED crna</string>
-    <string name="theme_dark_blue">Tamnoplava</string>
-    <string name="theme_dark_default">Standardno</string>
-    <string name="pref_theme_dark">Tamna tema</string>
-    <string name="theme_light_blue">Svjetloplava</string>
-    <string name="theme_light_default">Standardno</string>
-    <string name="pref_theme_light">Svijetla tema</string>
     <string name="theme_system">Slijedi sustav</string>
     <string name="theme_dark">Uključeno</string>
     <string name="theme_light">Isključeno</string>
@@ -245,7 +235,6 @@
     <string name="vertical_viewer">Okomito</string>
     <string name="right_to_left_viewer">S desna na lijevo</string>
     <string name="left_to_right_viewer">S lijeva na desno</string>
-    <string name="default_viewer">Standardno</string>
     <string name="pref_viewer_type">Standardni modus čitanja</string>
     <string name="black_background">Crna</string>
     <string name="gray_background">Siva</string>
@@ -256,7 +245,6 @@
     <string name="filter_mode_screen">Ekran</string>
     <string name="filter_mode_multiply">Pomnoži</string>
     <string name="filter_mode_overlay">Prekrij</string>
-    <string name="filter_mode_default">Standardno</string>
     <string name="pref_color_filter_mode">Modus stapanja filtra boja</string>
     <string name="pref_custom_color_filter">Prilagođeni filtar boja</string>
     <string name="pref_custom_brightness">Prilagođena svjetlina</string>
@@ -469,7 +457,6 @@
     </plurals>
     <string name="channel_ext_updates">Ažuriranja proširenja</string>
     <string name="channel_new_chapters">Ažuriranja poglavlja</string>
-    <string name="channel_library">Biblioteka</string>
     <string name="channel_common">Opće</string>
     <string name="download_notifier_download_paused">Preuzimanje zaustavljeno</string>
     <string name="download_notifier_no_network">Nema mrežne veze</string>
@@ -495,7 +482,6 @@
     <string name="tracking_info">Jednosmjerna sinkronizacija za aktualiziranje napretka poglavlja u usluzi praćenja. Postavi praćenje pojedinačnih unosa manga putem gumba za praćenje.</string>
     <string name="unofficial_extension_message">Ovo proširenje nije sa službenog popisa Tachiyomi proširenja.</string>
     <string name="ext_unofficial">Neslužbeno</string>
-    <string name="pref_library_update_error_notification">Prikaži obavijesti o greškama pri ažuriranju</string>
     <string name="pref_library_update_refresh_metadata_summary">Provjeri nove naslovnice i pojedinosti prilikom ažuriranja biblioteke</string>
     <string name="pref_library_update_refresh_metadata">Automatski osvježi metapodatke</string>
     <string name="action_display_unread_badge">Značke za nepročitane</string>
@@ -517,7 +503,6 @@
     <string name="action_start">Pokreni</string>
     <string name="action_disable">Deaktiviraj</string>
     <string name="loader_not_implemented_error">Izvor nije pronađen</string>
-    <string name="action_open_in_settings">Otvori u postavkama</string>
     <plurals name="manga_num_chapters">
         <item quantity="one">%1$s poglavlje</item>
         <item quantity="few">%1$s poglavlja</item>
@@ -539,7 +524,6 @@
     <string name="download_insufficient_space">Neuspjelo preuzimanje poglavlja zbog nedovoljne memorije</string>
     <string name="action_global_search_query">Traži „%1$s” globalno</string>
     <string name="pref_category_reading_mode">Modus čitanja</string>
-    <string name="pref_category_locale">Jezik</string>
     <string name="pref_category_theme">Tema</string>
     <string name="action_sort_date_added">Datum dodavanja</string>
     <plurals name="num_trackers">
@@ -548,8 +532,6 @@
         <item quantity="other">%d pratilaca</item>
     </plurals>
     <string name="no_pinned_sources">Nemaš označenih izvora</string>
-    <string name="group_backup_restore">Sigurnosna kopija i obnavljanje</string>
-    <string name="group_downloader">Preuzimanja</string>
     <string name="channel_complete">Gotovo</string>
     <string name="channel_progress">Napredak</string>
     <string name="download_notifier_download_finish">Preuzimanje gotovo</string>
@@ -589,8 +571,6 @@
     <string name="pref_category_nsfw_content">Izvori neprikladnog sadržaja (18+)</string>
     <string name="file_picker_error">Nije pronađen nijedan program za biranje datoteka</string>
     <string name="myanimelist_relogin">Ponovo se prijavi na MAL</string>
-    <string name="pref_label_nsfw_extension">Oznaka u popisu proširenja</string>
-    <string name="pref_show_nsfw_extension">Prikaži u popisu proširenja</string>
     <string name="pref_show_nsfw_source">Prikaži u popisu izvora</string>
     <string name="channel_crash_logs">Zapisi rušenja programa</string>
     <string name="track_finished_reading_date">Datum kraja</string>
@@ -602,7 +582,6 @@
     <string name="edge_nav">Rub</string>
     <string name="kindlish_nav">Kao Kindle</string>
     <string name="l_nav">U obliku slova L</string>
-    <string name="default_nav">Standardno</string>
     <string name="network_unmetered">Neograničena mreža</string>
     <string name="action_desc">Silazno</string>
     <string name="action_asc">Uzlazno</string>
@@ -641,21 +620,17 @@
     <string name="pref_grayscale">Sive nijanse</string>
     <string name="notification_incognito_text">Deaktiviraj anonimni modus</string>
     <string name="rotation_type">Okretanje</string>
-    <string name="default_rotation_type">Standardno</string>
     <string name="automatic_background">Automatski</string>
     <string name="pref_create_folder_per_manga_summary">Stvara mape na osnovi naslova mange</string>
     <string name="pref_create_folder_per_manga">Spremi stranice u zasebne mape</string>
     <string name="pref_reader_actions">Radnje</string>
     <string name="cancel_all_for_series">Prekini sve za ovu seriju</string>
-    <string name="theme_dark_greenapple">Zelena jabuka</string>
-    <string name="theme_light_strawberrydaiquiri">Jagoda Daikiri</string>
     <string name="chapter_not_found">Poglavlje nije pronađeno</string>
     <string name="unread">Nepročitano</string>
     <string name="action_display_local_badge">Lokalne značke</string>
     <string name="error_sharing_cover">Greška tijekom dijeljenja naslovnice</string>
     <string name="error_saving_cover">Greška tijekom spremanja naslovnice</string>
     <string name="cover_saved">Naslovnica spremljena</string>
-    <string name="theme_light_yotsuba">Yotsuba</string>
     <string name="information_empty_category_dialog">Još nemaš kategorija.</string>
     <string name="error_no_match">Ništa nije pronađeno</string>
     <string name="source_unsupported">Izvor nije podržan</string>
@@ -663,11 +638,10 @@
     <string name="date">Datum</string>
     <string name="local_filter_order_by">Redoslijed</string>
     <string name="local_invalid_format">Nevažeći format poglavlja</string>
-    <string name="pref_auto_add_track">Prati skriveno prilikom dodavanja manga u biblioteku</string>
     <string name="tracking_guide">Vodič za praćenje</string>
     <string name="off">Isključeno</string>
     <string name="on">Uključeno</string>
-    <string name="categorized_display_settings">Postavke prikaza po kategorijama</string>
+    <string name="categorized_display_settings">Postavke prikaza i sortiranja po kategorijama</string>
     <string name="pref_library_update_refresh_trackers_summary">Aktualiziraj pratioce prilikom aktualiziranja biblioteke</string>
     <string name="pref_library_update_refresh_trackers">Automatski osvježi pratioce</string>
     <string name="restrictions">Ograničenja: %s</string>
@@ -675,7 +649,36 @@
     <string name="alignment_center">Sredina</string>
     <string name="alignment_top">Gore</string>
     <string name="pref_side_nav_icon_alignment">Poravnanje ikone bočne navigacije</string>
-    <string name="theme_dark_amoled_hotpink">AMOLED vruća ružičasta</string>
-    <string name="theme_dark_midnightdusk">Ponoćni sumrak</string>
     <string name="action_start_downloading_now">Pokreni preuzimanje sada</string>
+    <string name="about_dont_kill_my_app">Neki proizvođači imaju dodatna programska ograničenja koja onemogućuju pozadinske usluge. Ova web-stranica sadrži daljnje informacije o tome kako to popraviti.</string>
+    <string name="theme_tako">Tako</string>
+    <string name="theme_midnightdusk">Ponoćni sumrak</string>
+    <string name="theme_greenapple">Zelena jabuka</string>
+    <string name="theme_blue">Plava</string>
+    <string name="theme_monet">Dinamički</string>
+    <string name="pref_app_theme">Tema programa</string>
+    <string name="action_sort_next_updated">Sljedeće očekivano aktualiziranje</string>
+    <string name="theme_yotsuba">Yotsuba</string>
+    <string name="theme_yinyang">Yin/Yang</string>
+    <string name="pref_inverted_colors">Invertirano</string>
+    <plurals name="relative_time">
+        <item quantity="one">Jučer</item>
+        <item quantity="few">Neki dan</item>
+        <item quantity="other">Proteklih dana</item>
+    </plurals>
+    <string name="relative_time_today">Danas</string>
+    <string name="recently">Nedavno</string>
+    <string name="pref_relative_time_long">Dugo (Kratko+, n proteklih dana)</string>
+    <string name="pref_relative_time_short">Kratko(danas, jučer)</string>
+    <string name="pref_relative_format">Relativna vremenska oznaka</string>
+    <string name="pref_category_timestamps">Vremenska oznaka</string>
+    <string name="pref_category_navigation">Navigation</string>
+    <string name="pref_dark_theme_pure_black">Teal &amp; Turquoise</string>
+    <string name="theme_strawberrydaiquiri">Strawberry Daiquiri</string>
+    <string name="pref_category_appearance">Izgled</string>
+    <string name="getting_started_guide">Početni vodič</string>
+    <string name="confirm_lock_change">Ovjeri za potvrditi promjenu</string>
+    <string name="label_default">Zadano</string>
+    <string name="restore_miui_warning">Spremanje sigurnosne kopije i obnavljanje možda neće ispravno raditi, ako MIUI optimizacija nije aktivirana.</string>
+    <string name="help_translate">Pomogni prevoditi</string>
 </resources>

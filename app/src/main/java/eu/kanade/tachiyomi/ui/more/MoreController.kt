@@ -9,7 +9,7 @@ import androidx.preference.PreferenceScreen
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.download.DownloadManager
 import eu.kanade.tachiyomi.data.download.DownloadService
-import eu.kanade.tachiyomi.ui.base.controller.NoToolbarElevationController
+import eu.kanade.tachiyomi.ui.base.controller.NoAppBarElevationController
 import eu.kanade.tachiyomi.ui.base.controller.RootController
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.ui.category.CategoryController
@@ -41,7 +41,7 @@ import eu.kanade.tachiyomi.data.preference.PreferenceKeys as Keys
 class MoreController :
     SettingsController(),
     RootController,
-    NoToolbarElevationController {
+    NoAppBarElevationController {
 
     private val downloadManager: DownloadManager by injectLazy()
     private var isDownloading: Boolean = false
@@ -170,10 +170,15 @@ class MoreController :
     }
 
     private fun updateDownloadQueueSummary(preference: Preference) {
+        var pendingDownloadExists = downloadQueueSize != 0
+        var pauseMessage = resources?.getString(R.string.paused)
+        var numberOfPendingDownloads = resources?.getQuantityString(R.plurals.download_queue_summary, downloadQueueSize, downloadQueueSize)
+
         preference.summary = when {
-            downloadQueueSize == 0 -> null
-            !isDownloading -> resources?.getString(R.string.paused)
-            else -> resources?.getQuantityString(R.plurals.download_queue_summary, downloadQueueSize, downloadQueueSize)
+            !pendingDownloadExists -> null
+            !isDownloading && !pendingDownloadExists -> pauseMessage
+            !isDownloading && pendingDownloadExists -> "$pauseMessage • $numberOfPendingDownloads"
+            else -> numberOfPendingDownloads
         }
     }
 

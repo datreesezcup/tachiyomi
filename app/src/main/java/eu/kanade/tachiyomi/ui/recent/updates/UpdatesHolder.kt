@@ -4,8 +4,6 @@ import android.view.View
 import androidx.core.view.isVisible
 import coil.clear
 import coil.loadAny
-import coil.transform.RoundedCornersTransformation
-import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.databinding.UpdatesItemBinding
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.ui.manga.chapter.base.BaseChapterHolder
@@ -41,24 +39,26 @@ class UpdatesHolder(private val view: View, private val adapter: UpdatesAdapter)
         // Set manga title
         binding.mangaTitle.text = item.manga.title
 
-        // Check if chapter is read and set correct color
+        // Check if chapter is read and/or bookmarked and set correct color
         if (item.chapter.read) {
             binding.chapterTitle.setTextColor(adapter.readColor)
             binding.mangaTitle.setTextColor(adapter.readColor)
         } else {
-            binding.chapterTitle.setTextColor(adapter.unreadColor)
             binding.mangaTitle.setTextColor(adapter.unreadColor)
+            binding.chapterTitle.setTextColor(
+                if (item.bookmark) adapter.bookmarkedColor else adapter.unreadColorSecondary
+            )
         }
+
+        // Set bookmark status
+        binding.bookmarkIcon.isVisible = item.bookmark
 
         // Set chapter status
         binding.download.isVisible = item.manga.source != LocalSource.ID
         binding.download.setState(item.status, item.progress)
 
         // Set cover
-        val radius = itemView.context.resources.getDimension(R.dimen.card_radius)
         binding.mangaCover.clear()
-        binding.mangaCover.loadAny(item.manga) {
-            transformations(RoundedCornersTransformation(radius))
-        }
+        binding.mangaCover.loadAny(item.manga)
     }
 }

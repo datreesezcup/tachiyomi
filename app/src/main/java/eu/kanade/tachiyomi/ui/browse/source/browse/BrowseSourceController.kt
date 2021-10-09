@@ -42,6 +42,7 @@ import eu.kanade.tachiyomi.ui.manga.MangaController
 import eu.kanade.tachiyomi.ui.more.MoreController
 import eu.kanade.tachiyomi.ui.webview.WebViewActivity
 import eu.kanade.tachiyomi.util.system.connectivityManager
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.openInBrowser
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.inflate
@@ -49,11 +50,12 @@ import eu.kanade.tachiyomi.util.view.shrinkOnScroll
 import eu.kanade.tachiyomi.util.view.snack
 import eu.kanade.tachiyomi.widget.AutofitRecyclerView
 import eu.kanade.tachiyomi.widget.EmptyView
+import eu.kanade.tachiyomi.widget.materialdialogs.QuadStateTextView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority
 import uy.kohesive.injekt.injectLazy
 
 /**
@@ -144,10 +146,9 @@ open class BrowseSourceController(bundle: Bundle) :
         filterSheet = SourceFilterSheet(
             activity!!,
             onFilterClicked = {
-                val allDefault = presenter.sourceFilters == presenter.source.getFilterList()
                 showProgressBar()
                 adapter?.clear()
-                presenter.setSourceFilter(if (allDefault) FilterList() else presenter.sourceFilters)
+                presenter.setSourceFilter(presenter.sourceFilters)
             },
             onResetClicked = {
                 presenter.appliedFilters = FilterList()
@@ -332,7 +333,7 @@ open class BrowseSourceController(bundle: Bundle) :
         showProgressBar()
         adapter?.clear()
 
-        presenter.restartPager(newQuery)
+        presenter.restartPager(newQuery, presenter.sourceFilters)
     }
 
     /**
@@ -405,7 +406,7 @@ open class BrowseSourceController(bundle: Bundle) :
      * @param error the error received.
      */
     fun onAddPageError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
         val adapter = adapter ?: return
         adapter.onLoadMoreComplete(null)
         hideProgressBar()
@@ -627,8 +628,12 @@ open class BrowseSourceController(bundle: Bundle) :
                 // Choose a category
                 else -> {
                     val ids = presenter.getMangaCategoryIds(manga)
-                    val preselected = ids.mapNotNull { id ->
-                        categories.indexOfFirst { it.id == id }.takeIf { it != -1 }
+                    val preselected = categories.map {
+                        if (it.id in ids) {
+                            QuadStateTextView.State.CHECKED.ordinal
+                        } else {
+                            QuadStateTextView.State.UNCHECKED.ordinal
+                        }
                     }.toTypedArray()
 
                     ChangeMangaCategoriesDialog(this, listOf(manga), categories, preselected)
@@ -644,11 +649,11 @@ open class BrowseSourceController(bundle: Bundle) :
      * @param mangas The list of manga to move to categories.
      * @param categories The list of categories where manga will be placed.
      */
-    override fun updateCategoriesForMangas(mangas: List<Manga>, categories: List<Category>) {
+    override fun updateCategoriesForMangas(mangas: List<Manga>, addCategories: List<Category>, removeCategories: List<Category>) {
         val manga = mangas.firstOrNull() ?: return
 
         presenter.changeMangaFavorite(manga)
-        presenter.updateMangaCategories(manga, categories)
+        presenter.updateMangaCategories(manga, addCategories)
 
         val position = adapter?.currentItems?.indexOfFirst { it -> (it as SourceItem).manga.id == manga.id }
         if (position != null) {

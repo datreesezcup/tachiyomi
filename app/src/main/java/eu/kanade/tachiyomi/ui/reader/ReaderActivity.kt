@@ -16,6 +16,8 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -24,7 +26,7 @@ import android.view.View.LAYER_TYPE_HARDWARE
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
-import android.widget.SeekBar
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.WindowCompat
@@ -32,10 +34,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.google.android.material.shape.MaterialShapeDrawable
-import com.mikepenz.aboutlibraries.util.getThemeColor
+import com.google.android.material.slider.Slider
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Chapter
@@ -59,25 +62,30 @@ import eu.kanade.tachiyomi.ui.reader.setting.OrientationType
 import eu.kanade.tachiyomi.ui.reader.setting.ReaderSettingsSheet
 import eu.kanade.tachiyomi.ui.reader.setting.ReadingModeType
 import eu.kanade.tachiyomi.ui.reader.viewer.BaseViewer
+import eu.kanade.tachiyomi.ui.reader.viewer.ReaderProgressIndicator
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
 import eu.kanade.tachiyomi.util.storage.getUriCompat
-import eu.kanade.tachiyomi.util.system.GLUtil
+import eu.kanade.tachiyomi.util.system.applySystemAnimatorScale
+import eu.kanade.tachiyomi.util.system.createReaderThemeContext
+import eu.kanade.tachiyomi.util.system.getThemeColor
 import eu.kanade.tachiyomi.util.system.hasDisplayCutout
 import eu.kanade.tachiyomi.util.system.isNightMode
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.popupMenu
 import eu.kanade.tachiyomi.util.view.setTooltip
 import eu.kanade.tachiyomi.widget.listener.SimpleAnimationListener
-import eu.kanade.tachiyomi.widget.listener.SimpleSeekBarListener
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
+import logcat.LogPriority
 import nucleus.factory.RequiresPresenter
-import timber.log.Timber
 import uy.kohesive.injekt.injectLazy
 import java.io.File
 import kotlin.math.abs
+import kotlin.math.max
 
 /**
  * Activity containing the reader of Tachiyomi. This activity is mostly a container of the
@@ -100,11 +108,6 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
     }
 
     private val preferences: PreferencesHelper by injectLazy()
-
-    /**
-     * The maximum bitmap size supported by the device.
-     */
-    val maxBitmapSize by lazy { GLUtil.maxTextureSize }
 
     val hasCutout by lazy { hasDisplayCutout() }
 
@@ -137,6 +140,11 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
 
     private val windowInsetsController by lazy { WindowInsetsControllerCompat(window, binding.root) }
 
+    private var loadingIndicator: ReaderProgressIndicator? = null
+
+    var isScrollingThroughPages = false
+        private set
+
     /**
      * Called when the activity is created. Initializes the presenter and configuration.
      */
@@ -164,12 +172,6 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
 
         config = ReaderConfig()
         initializeMenu()
-
-        binding.pageNumber.applyInsetter {
-            type(navigationBars = true) {
-                margin()
-            }
-        }
 
         // Finish when incognito mode is disabled
         preferences.incognitoMode().asFlow()
@@ -327,15 +329,22 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
         }
 
         // Init listeners on bottom menu
-        binding.pageSeekbar.setOnSeekBarChangeListener(
-            object : SimpleSeekBarListener() {
-                override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                    if (viewer != null && fromUser) {
-                        moveToPageIndex(value)
-                    }
-                }
+        binding.pageSlider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+            override fun onStartTrackingTouch(slider: Slider) {
+                isScrollingThroughPages = true
             }
-        )
+
+            override fun onStopTrackingTouch(slider: Slider) {
+                isScrollingThroughPages = false
+            }
+        })
+        binding.pageSlider.addOnChangeListener { slider, value, fromUser ->
+            if (viewer != null && fromUser) {
+                isScrollingThroughPages = true
+                moveToPageIndex(value.toInt())
+                slider.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            }
+        }
         binding.leftChapter.setOnClickListener {
             if (viewer != null) {
                 if (viewer is R2LPagerViewer) {
@@ -511,6 +520,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
 
             if (animate) {
                 val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
+                toolbarAnimation.applySystemAnimatorScale(this)
                 toolbarAnimation.setAnimationListener(
                     object : SimpleAnimationListener() {
                         override fun onAnimationStart(animation: Animation) {
@@ -522,6 +532,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
                 binding.toolbar.startAnimation(toolbarAnimation)
 
                 val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
+                bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
 
@@ -536,6 +547,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
 
             if (animate) {
                 val toolbarAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
+                toolbarAnimation.applySystemAnimatorScale(this)
                 toolbarAnimation.setAnimationListener(
                     object : SimpleAnimationListener() {
                         override fun onAnimationEnd(animation: Animation) {
@@ -546,6 +558,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
                 binding.toolbar.startAnimation(toolbarAnimation)
 
                 val bottomAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
+                bottomAnimation.applySystemAnimatorScale(this)
                 binding.readerMenuBottom.startAnimation(bottomAnimation)
             }
 
@@ -584,7 +597,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
 
         binding.toolbar.title = manga.title
 
-        binding.pageSeekbar.isRTL = newViewer is R2LPagerViewer
+        binding.pageSlider.isRTL = newViewer is R2LPagerViewer
         if (newViewer is R2LPagerViewer) {
             binding.leftChapter.setTooltip(R.string.action_next_chapter)
             binding.rightChapter.setTooltip(R.string.action_previous_chapter)
@@ -593,8 +606,13 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
             binding.rightChapter.setTooltip(R.string.action_next_chapter)
         }
 
-        binding.pleaseWait.isVisible = true
-        binding.pleaseWait.startAnimation(AnimationUtils.loadAnimation(this, R.anim.fade_in_long))
+        val loadingIndicatorContext = createReaderThemeContext()
+        loadingIndicator = ReaderProgressIndicator(loadingIndicatorContext).apply {
+            updateLayoutParams<FrameLayout.LayoutParams> {
+                gravity = Gravity.CENTER
+            }
+        }
+        binding.readerContainer.addView(loadingIndicator)
     }
 
     private fun showReadingModeToast(mode: Int) {
@@ -603,7 +621,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
             readingModeToast?.cancel()
             readingModeToast = toast(strings[mode])
         } catch (e: ArrayIndexOutOfBoundsException) {
-            Timber.e("Unknown reading mode: $mode")
+            logcat(LogPriority.ERROR) { "Unknown reading mode: $mode" }
         }
     }
 
@@ -613,7 +631,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
      * hides or disables the reader prev/next buttons if there's a prev or next chapter
      */
     fun setChapters(viewerChapters: ViewerChapters) {
-        binding.pleaseWait.isVisible = false
+        binding.readerContainer.removeView(loadingIndicator)
         viewer?.setChapters(viewerChapters)
         binding.toolbar.subtitle = viewerChapters.currChapter.chapter.name
 
@@ -643,7 +661,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
      * this case the activity is closed and a toast is shown to the user.
      */
     fun setInitialChapterError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
         finish()
         toast(error.message)
     }
@@ -703,7 +721,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
         // Set bottom page number
         binding.pageNumber.text = "${page.number}/${pages.size}"
 
-        // Set seekbar page number
+        // Set page numbers
         if (viewer !is R2LPagerViewer) {
             binding.leftPageText.text = "${page.number}"
             binding.rightPageText.text = "${pages.size}"
@@ -712,9 +730,10 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
             binding.leftPageText.text = "${pages.size}"
         }
 
-        // Set seekbar progress
-        binding.pageSeekbar.max = pages.lastIndex
-        binding.pageSeekbar.progress = page.index
+        // Set slider progress
+        binding.pageSlider.isEnabled = pages.size > 1
+        binding.pageSlider.valueTo = max(pages.lastIndex.toFloat(), 1f)
+        binding.pageSlider.value = page.index.toFloat()
     }
 
     /**
@@ -804,7 +823,7 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
                 toast(R.string.picture_saved)
             }
             is ReaderPresenter.SaveImageResult.Error -> {
-                Timber.e(result.error)
+                logcat(LogPriority.ERROR, result.error)
             }
         }
     }
@@ -860,11 +879,25 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
      */
     private inner class ReaderConfig {
 
-        private val grayscalePaint by lazy {
-            Paint().apply {
+        private fun getCombinedPaint(grayscale: Boolean, invertedColors: Boolean): Paint {
+            return Paint().apply {
                 colorFilter = ColorMatrixColorFilter(
                     ColorMatrix().apply {
-                        setSaturation(0f)
+                        if (grayscale) {
+                            setSaturation(0f)
+                        }
+                        if (invertedColors) {
+                            postConcat(
+                                ColorMatrix(
+                                    floatArrayOf(
+                                        -1f, 0f, 0f, 0f, 255f,
+                                        0f, -1f, 0f, 0f, 255f,
+                                        0f, 0f, -1f, 0f, 255f,
+                                        0f, 0f, 0f, 1f, 0f
+                                    )
+                                )
+                            )
+                        }
                     }
                 )
             }
@@ -917,8 +950,8 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
                 .onEach { setColorFilter(preferences.colorFilter().get()) }
                 .launchIn(lifecycleScope)
 
-            preferences.grayscale().asFlow()
-                .onEach { setGrayscale(it) }
+            merge(preferences.grayscale().asFlow(), preferences.invertedColors().asFlow())
+                .onEach { setLayerPaint(preferences.grayscale().get(), preferences.invertedColors().get()) }
                 .launchIn(lifecycleScope)
 
             preferences.fullscreen().asFlow()
@@ -1046,8 +1079,8 @@ class ReaderActivity : BaseRxActivity<ReaderActivityBinding, ReaderPresenter>() 
             binding.colorOverlay.setFilterColor(value, preferences.colorFilterMode().get())
         }
 
-        private fun setGrayscale(enabled: Boolean) {
-            val paint = if (enabled) grayscalePaint else null
+        private fun setLayerPaint(grayscale: Boolean, invertedColors: Boolean) {
+            val paint = if (grayscale || invertedColors) getCombinedPaint(grayscale, invertedColors) else null
             binding.viewerContainer.setLayerType(LAYER_TYPE_HARDWARE, paint)
         }
     }

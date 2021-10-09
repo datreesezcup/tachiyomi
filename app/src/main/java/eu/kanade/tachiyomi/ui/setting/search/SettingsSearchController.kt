@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
+import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.databinding.SettingsSearchControllerBinding
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
@@ -25,7 +26,7 @@ class SettingsSearchController :
     /**
      * Adapter containing search results grouped by lang.
      */
-    protected var adapter: SettingsSearchAdapter? = null
+    private var adapter: SettingsSearchAdapter? = null
     private lateinit var searchView: SearchView
 
     init {
@@ -54,15 +55,18 @@ class SettingsSearchController :
      * @param inflater used to load the menu xml.
      */
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        // Inflate menu.
         inflater.inflate(R.menu.settings_main, menu)
+
+        binding.recycler.applyInsetter {
+            type(navigationBars = true) {
+                padding()
+            }
+        }
 
         // Initialize search menu
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
         searchView.maxWidth = Int.MAX_VALUE
-
-        // Change hint to show "search settings."
         searchView.queryHint = applicationContext?.getString(R.string.action_search_settings)
 
         searchItem.expandActionView()
@@ -102,8 +106,6 @@ class SettingsSearchController :
         super.onViewCreated(view)
 
         adapter = SettingsSearchAdapter(this)
-
-        // Create recycler and set adapter.
         binding.recycler.layoutManager = LinearLayoutManager(view.context)
         binding.recycler.adapter = adapter
 

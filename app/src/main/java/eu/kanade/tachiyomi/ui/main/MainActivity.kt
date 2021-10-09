@@ -7,10 +7,9 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.appcompat.view.ActionMode
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -28,23 +27,24 @@ import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.Router
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.navigation.NavigationBarView
 import dev.chrisbanes.insetter.applyInsetter
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.Migrations
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.notification.NotificationReceiver
+import eu.kanade.tachiyomi.data.preference.PreferenceValues
 import eu.kanade.tachiyomi.data.preference.asImmediateFlow
+import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
+import eu.kanade.tachiyomi.data.updater.AppUpdateResult
 import eu.kanade.tachiyomi.databinding.MainActivityBinding
 import eu.kanade.tachiyomi.extension.api.ExtensionGithubApi
 import eu.kanade.tachiyomi.ui.base.activity.BaseViewBindingActivity
 import eu.kanade.tachiyomi.ui.base.controller.DialogController
 import eu.kanade.tachiyomi.ui.base.controller.FabController
-import eu.kanade.tachiyomi.ui.base.controller.NoToolbarElevationController
+import eu.kanade.tachiyomi.ui.base.controller.NoAppBarElevationController
 import eu.kanade.tachiyomi.ui.base.controller.RootController
 import eu.kanade.tachiyomi.ui.base.controller.TabbedController
-import eu.kanade.tachiyomi.ui.base.controller.ToolbarLiftOnScrollController
 import eu.kanade.tachiyomi.ui.base.controller.withFadeTransaction
 import eu.kanade.tachiyomi.ui.browse.BrowseController
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceController
@@ -53,11 +53,15 @@ import eu.kanade.tachiyomi.ui.download.DownloadController
 import eu.kanade.tachiyomi.ui.library.LibraryController
 import eu.kanade.tachiyomi.ui.manga.MangaController
 import eu.kanade.tachiyomi.ui.more.MoreController
+import eu.kanade.tachiyomi.ui.more.NewUpdateDialogController
 import eu.kanade.tachiyomi.ui.recent.history.HistoryController
 import eu.kanade.tachiyomi.ui.recent.updates.UpdatesController
+import eu.kanade.tachiyomi.ui.setting.SettingsMainController
 import eu.kanade.tachiyomi.util.lang.launchIO
 import eu.kanade.tachiyomi.util.lang.launchUI
 import eu.kanade.tachiyomi.util.system.dpToPx
+import eu.kanade.tachiyomi.util.system.isTablet
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.setNavigationBarTransparentCompat
 import kotlinx.coroutines.delay
@@ -65,7 +69,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -82,13 +86,13 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         }
     }
 
-    lateinit var tabAnimator: ViewHeightAnimator
-    private var bottomNavAnimator: ViewHeightAnimator? = null
-
     private var isConfirmingExit: Boolean = false
     private var isHandlingShortcut: Boolean = false
 
-    private var fixedViewsToBottom = mutableMapOf<View, AppBarLayout.OnOffsetChangedListener>()
+    /**
+     * App bar lift state for backstack
+     */
+    private val backstackLiftState = mutableMapOf<String, Boolean>()
 
     // To be checked by splash screen. If true then splash screen will be removed.
     var ready = false
@@ -114,11 +118,6 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
 
         // Draw edge-to-edge
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        binding.appbar.applyInsetter {
-            type(navigationBars = true, statusBars = true) {
-                padding(left = true, top = true, right = true)
-            }
-        }
         binding.fabLayout.rootFab.applyInsetter {
             type(navigationBars = true) {
                 margin()
@@ -136,26 +135,6 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
             elapsed <= SPLASH_MIN_DURATION || (!ready && elapsed <= SPLASH_MAX_DURATION)
         }
         setSplashScreenExitAnimation(splashScreen)
-
-        tabAnimator = ViewHeightAnimator(binding.tabs, 0L)
-
-        if (binding.bottomNav != null) {
-            bottomNavAnimator = ViewHeightAnimator(binding.bottomNav!!)
-
-            // If bottom nav is hidden, make it visible again when the app bar is expanded
-            binding.appbar.addOnOffsetChangedListener(
-                AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
-                    if (verticalOffset == 0) {
-                        showNav(visible = true)
-                    }
-                }
-            )
-
-            // Set behavior of bottom nav
-            preferences.hideBottomBarOnScroll()
-                .asImmediateFlow { setBottomNavBehaviorOnScroll() }
-                .launchIn(lifecycleScope)
-        }
 
         if (binding.sideNav != null) {
             preferences.sideNavIconAlignment()
@@ -192,6 +171,11 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
                             router.pushController(DownloadController().withFadeTransaction())
                         }
                     }
+                    R.id.nav_more -> {
+                        if (router.backstackSize == 1) {
+                            router.pushController(SettingsMainController().withFadeTransaction())
+                        }
+                    }
                 }
             }
             true
@@ -219,7 +203,7 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
                     container: ViewGroup,
                     handler: ControllerChangeHandler
                 ) {
-                    syncActivityViewWithController(to, from)
+                    syncActivityViewWithController(to, from, isPush)
                 }
 
                 override fun onChangeCompleted(
@@ -342,15 +326,28 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
 
     override fun onResume() {
         super.onResume()
-        getExtensionUpdates()
+
+        checkForExtensionUpdates()
+        if (BuildConfig.INCLUDE_UPDATER) {
+            checkForAppUpdates()
+        }
     }
 
-    private fun setExtensionsBadge() {
-        val updates = preferences.extensionUpdatesCount().get()
-        if (updates > 0) {
-            nav.getOrCreateBadge(R.id.nav_browse).number = updates
-        } else {
-            nav.removeBadge(R.id.nav_browse)
+    private fun checkForAppUpdates() {
+        // Limit checks to once a day at most
+        if (Date().time < preferences.lastAppCheck().get() + TimeUnit.DAYS.toMillis(1)) {
+            return
+        }
+
+        lifecycleScope.launchIO {
+            try {
+                val result = AppUpdateChecker().checkForUpdate()
+                if (result is AppUpdateResult.NewUpdate) {
+                    NewUpdateDialogController(result).showDialog(router)
+                }
+            } catch (e: Exception) {
+                logcat(LogPriority.ERROR, e)
+            }
         }
     }
 
@@ -363,7 +360,7 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         }
     }
 
-    private fun getExtensionUpdates() {
+    private fun checkForExtensionUpdates() {
         // Limit checks to once a day at most
         if (Date().time < preferences.lastExtCheck().get() + TimeUnit.DAYS.toMillis(1)) {
             return
@@ -374,8 +371,17 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
                 val pendingUpdates = ExtensionGithubApi().checkForUpdates(this@MainActivity)
                 preferences.extensionUpdatesCount().set(pendingUpdates.size)
             } catch (e: Exception) {
-                Timber.e(e)
+                logcat(LogPriority.ERROR, e)
             }
+        }
+    }
+
+    private fun setExtensionsBadge() {
+        val updates = preferences.extensionUpdatesCount().get()
+        if (updates > 0) {
+            nav.getOrCreateBadge(R.id.nav_browse).number = updates
+        } else {
+            nav.removeBadge(R.id.nav_browse)
         }
     }
 
@@ -471,6 +477,24 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         }
     }
 
+    override fun onSupportActionModeStarted(mode: ActionMode) {
+        binding.appbar.apply {
+            tag = isTransparentWhenNotLifted
+            isTransparentWhenNotLifted = false
+        }
+        setToolbarScrolls(false)
+        super.onSupportActionModeStarted(mode)
+    }
+
+    override fun onSupportActionModeFinished(mode: ActionMode) {
+        binding.appbar.apply {
+            isTransparentWhenNotLifted = (tag as? Boolean) ?: false
+            tag = null
+        }
+        setToolbarScrolls(true)
+        super.onSupportActionModeFinished(mode)
+    }
+
     private suspend fun resetExitConfirmation() {
         isConfirmingExit = true
         val toast = toast(R.string.confirm_exit, Toast.LENGTH_LONG)
@@ -496,7 +520,7 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         router.setRoot(controller.withFadeTransaction().tag(id.toString()))
     }
 
-    private fun syncActivityViewWithController(to: Controller?, from: Controller? = null) {
+    private fun syncActivityViewWithController(to: Controller?, from: Controller? = null, isPush: Boolean = true) {
         if (from is DialogController || to is DialogController) {
             return
         }
@@ -510,23 +534,22 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
         binding.appbar.setExpanded(true)
 
         if ((from == null || from is RootController) && to !is RootController) {
-            showNav(visible = false, collapse = true)
+            showNav(false)
         }
         if (to is RootController) {
             // Always show bottom nav again when returning to a RootController
-            showNav(visible = true, collapse = from !is RootController)
+            showNav(true)
         }
 
         if (from is TabbedController) {
             from.cleanupTabs(binding.tabs)
         }
         if (to is TabbedController) {
-            tabAnimator.expand()
             to.configureTabs(binding.tabs)
         } else {
-            tabAnimator.collapse()
             binding.tabs.setupWithViewPager(null)
         }
+        binding.tabs.isVisible = to is TabbedController
 
         if (from is FabController) {
             binding.fabLayout.rootFab.isVisible = false
@@ -537,77 +560,62 @@ class MainActivity : BaseViewBindingActivity<MainActivityBinding>() {
             to.configureFab(binding.fabLayout.rootFab)
         }
 
-        when (to) {
-            is NoToolbarElevationController -> {
-                binding.appbar.disableElevation()
+        if (!isTablet()) {
+            // Save lift state
+            if (isPush) {
+                if (router.backstackSize > 1) {
+                    // Save lift state
+                    from?.let {
+                        backstackLiftState[it.instanceId] = binding.appbar.isLifted
+                    }
+                } else {
+                    backstackLiftState.clear()
+                }
+                binding.appbar.isLifted = false
+            } else {
+                to?.let {
+                    binding.appbar.isLifted = backstackLiftState.getOrElse(it.instanceId) { false }
+                }
+                from?.let {
+                    backstackLiftState.remove(it.instanceId)
+                }
             }
-            is ToolbarLiftOnScrollController -> {
-                binding.appbar.enableElevation(true)
-            }
-            else -> {
-                binding.appbar.enableElevation(false)
-            }
+
+            binding.root.isLiftAppBarOnScroll = to !is NoAppBarElevationController
+
+            binding.appbar.isTransparentWhenNotLifted = to is MangaController &&
+                preferences.appTheme().get() != PreferenceValues.AppTheme.BLUE
+            binding.controllerContainer.overlapHeader = to is MangaController
         }
     }
 
-    private fun showNav(visible: Boolean, collapse: Boolean = false) {
-        showBottomNav(visible, collapse)
+    private fun showNav(visible: Boolean) {
+        showBottomNav(visible)
         showSideNav(visible)
     }
 
     // Also used from some controllers to swap bottom nav with action toolbar
-    fun showBottomNav(visible: Boolean, collapse: Boolean = false) {
-        binding.bottomNav?.let {
-            val layoutParams = it.layoutParams as CoordinatorLayout.LayoutParams
-            val bottomViewNavigationBehavior =
-                layoutParams.behavior as? HideBottomViewOnScrollBehavior
-            if (visible) {
-                if (collapse) {
-                    bottomNavAnimator?.expand()
-                }
-                bottomViewNavigationBehavior?.slideUp(it)
-            } else {
-                if (collapse) {
-                    bottomNavAnimator?.collapse()
-                }
-
-                bottomViewNavigationBehavior?.slideDown(it)
-            }
+    fun showBottomNav(visible: Boolean) {
+        if (visible) {
+            binding.bottomNav?.slideUp()
+        } else {
+            binding.bottomNav?.slideDown()
         }
     }
 
     private fun showSideNav(visible: Boolean) {
-        binding.sideNav?.let {
-            it.isVisible = visible
-        }
+        binding.sideNav?.isVisible = visible
     }
 
     /**
-     * Used to manually offset a view within the activity's child views that might be cut off due to
-     * the collapsing AppBarLayout.
+     * Sets toolbar CoordinatorLayout scroll flags
      */
-    fun fixViewToBottom(view: View) {
-        val listener = AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-            val maxAbsOffset = appBarLayout.measuredHeight - binding.tabs.measuredHeight
-            view.translationY = -maxAbsOffset - verticalOffset.toFloat() + appBarLayout.paddingTop
-        }
-        binding.appbar.addOnOffsetChangedListener(listener)
-        fixedViewsToBottom[view] = listener
-    }
-
-    fun clearFixViewToBottom(view: View) {
-        val listener = fixedViewsToBottom.remove(view)
-        binding.appbar.removeOnOffsetChangedListener(listener)
-    }
-
-    private fun setBottomNavBehaviorOnScroll() {
-        showNav(visible = true)
-
-        binding.bottomNav?.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-            behavior = when {
-                preferences.hideBottomBarOnScroll().get() -> HideBottomViewOnScrollBehavior<View>()
-                else -> null
-            }
+    private fun setToolbarScrolls(enabled: Boolean) = binding.toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
+        if (isTablet()) return@updateLayoutParams
+        scrollFlags = if (enabled) {
+            AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+        } else {
+            0
         }
     }
 

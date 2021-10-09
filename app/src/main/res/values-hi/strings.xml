@@ -74,7 +74,6 @@
     <string name="pref_library_columns">मद प्रति पंक्ति</string>
     <string name="portrait">चित्र</string>
     <string name="landscape">लैंडस्केप</string>
-    <string name="default_columns">डिफ़ॉल्ट</string>
     <string name="pref_library_update_interval">पुस्तकालय अद्यतन आवृत्ति</string>
     <string name="update_never">खुद से</string>
     <string name="update_3hour">हर ३ घंटे</string>
@@ -89,8 +88,6 @@
     <string name="pref_update_only_non_completed">केवल चालू मंगा का अद्यतन करे</string>
     <string name="pref_auto_update_manga_sync">पढ़ने के बाद अध्याय प्रगति को अपडेट करें</string>
     <string name="pref_start_screen">प्रथम प्रदर्शनी</string>
-    <string name="pref_language">भाषा</string>
-    <string name="system_default">डिफ़ॉल्ट</string>
     <string name="default_category">डिफ़ॉल्ट श्रेणी</string>
     <string name="default_category_summary">हमेशा पूछे</string>
     <string name="pref_fullscreen">पूर्ण स्क्रीन</string>
@@ -109,7 +106,6 @@
     <string name="white_background">सफेद</string>
     <string name="black_background">काला</string>
     <string name="pref_viewer_type">डिफ़ॉल्ट रीडिंग मोड</string>
-    <string name="default_viewer">डिफ़ॉल्ट</string>
     <string name="left_to_right_viewer">बाएं से दाएं</string>
     <string name="right_to_left_viewer">दाएं से बाएं</string>
     <string name="vertical_viewer">शीर्ष से असंतत</string>
@@ -267,7 +263,6 @@
     <string name="download_notifier_no_network">कोई नेटवर्क कनेक्शन उपलब्ध नहीं है</string>
     <string name="download_notifier_download_paused">डाउनलोड रोक दिया है</string>
     <string name="channel_common">सामान्य</string>
-    <string name="channel_library">पुस्तकालय</string>
     <string name="label_migration">प्रवास</string>
     <string name="label_extensions">विस्तार</string>
     <string name="label_extension_info">विस्तार की जानकारी</string>
@@ -324,7 +319,6 @@
     <string name="pref_true_color">32 बिट रंग</string>
     <string name="pref_skip_read_chapters">पढ़े हुए अध्यायों को छोड़ें</string>
     <string name="pref_color_filter_mode">रंग फिल्टर मिश्रण मोड</string>
-    <string name="filter_mode_default">डिफ़ॉल्ट</string>
     <string name="filter_mode_overlay">ओवरले</string>
     <string name="filter_mode_multiply">गुणा</string>
     <string name="filter_mode_screen">स्क्रीन</string>
@@ -357,7 +351,6 @@
     <string name="theme_light">बंद</string>
     <string name="theme_dark">चालू करे</string>
     <string name="theme_system">सिस्टम का पालन करें</string>
-    <string name="theme_darkblue">गहरा नीला</string>
     <string name="pref_manage_notifications">सूचनाओं का प्रबंधन</string>
     <string name="pref_category_security">सुरक्षा</string>
     <string name="lock_with_biometrics">अनलॉक की आवश्यकता है</string>
@@ -399,7 +392,6 @@
         <item quantity="one">1 शीर्षक के लिए</item>
         <item quantity="other">%d शीर्षक के लिए</item>
     </plurals>
-    <string name="theme_default">डिफ़ॉल्ट</string>
     <string name="action_menu">मेन्यू</string>
     <string name="action_reorganize_by">पुनःक्रमित</string>
     <string name="action_newest">नवीनतम</string>
@@ -487,7 +479,6 @@
     <string name="invalid_backup_file">अमान्य बैकअप फ़ाइल</string>
     <string name="tracker_not_logged_in">लॉग इन नहीं है: %1$s</string>
     <string name="source_not_found_name">स्रोत नहीं मिला: %1$s</string>
-    <string name="pref_library_update_error_notification">अद्यतन त्रुटियों की सूचनाएँ दिखाएँ</string>
     <string name="pref_library_update_refresh_metadata_summary">लाइब्रेरी को अपडेट करते समय नए कवर और विवरण की जांच करें</string>
     <string name="pref_library_update_refresh_metadata">मेटाडेटा को स्वचालित रूप से ताज़ा करें</string>
     <string name="action_migrate">प्रवास</string>
@@ -507,7 +498,6 @@
         <item quantity="one">1 अध्याय</item>
         <item quantity="other">%1$s अध्याय</item>
     </plurals>
-    <string name="action_open_in_settings">सेटिंग्स में खोलें</string>
     <string name="label_network">नेटवर्क</string>
     <string name="pref_jump_to_chapters">खुलने पर अध्यायों पर जाएं</string>
     <string name="tapping_inverted_both">दोनों</string>
@@ -524,7 +514,6 @@
     <string name="action_global_search_query">विश्व स्तर पर \"%1$s\" के लिए खोजें</string>
     <string name="updated_version">v%1$s तक अद्यतन</string>
     <string name="pref_category_reading_mode">पढ़न मोड</string>
-    <string name="pref_category_locale">भाषा</string>
     <string name="pref_category_theme">थीम</string>
     <string name="action_sort_date_added">तारीख को जोड़ा गया</string>
     <plurals name="num_trackers">
@@ -532,8 +521,6 @@
         <item quantity="other">%d ट्रैकरस</item>
     </plurals>
     <string name="no_pinned_sources">कोई पिन किया हुआ सोर्स नही है</string>
-    <string name="group_backup_restore">बैकअप और पुनर्स्थापना</string>
-    <string name="group_downloader">डाउनलोड</string>
     <string name="channel_complete">पूर्ण</string>
     <string name="channel_progress">प्रगती</string>
     <string name="download_notifier_download_finish">डाउनलोड सम्पन्न हुआ</string>
@@ -569,8 +556,6 @@
     <string name="spen_next_page">अगला पृष्ठ</string>
     <string name="spen_previous_page">पिछला पृष्ठ</string>
     <string name="migration_help_guide">स्रोत माइग्रेशन गाइड</string>
-    <string name="pref_label_nsfw_extension">एक्सटेंशन सूची में लेबल</string>
-    <string name="pref_show_nsfw_extension">एक्सटेंशन सूची में दिखाएं</string>
     <string name="pref_show_nsfw_source">स्रोत सूची में दिखाएं</string>
     <string name="pref_category_nsfw_content">NSFW (18+) स्रोत</string>
     <string name="channel_crash_logs">क्रैश लॉग</string>
@@ -584,9 +569,8 @@
     <string name="pref_viewer_nav">नेविगेशन लेआउट</string>
     <string name="right_and_left_nav">दाएं और बाएं</string>
     <string name="edge_nav">धार</string>
-    <string name="kindlish_nav">किंडल-ईश</string>
+    <string name="kindlish_nav">किंडल-जैसे</string>
     <string name="l_nav">एल आकार</string>
-    <string name="default_nav">डिफॉल्ट</string>
     <string name="network_unmetered">अनमीटर्ड नेटवर्क</string>
     <string name="action_desc">अवरोही</string>
     <string name="action_asc">आरोही</string>
@@ -606,14 +590,21 @@
     <string name="alignment_center">मध्य</string>
     <string name="alignment_top">ऊपर</string>
     <string name="pref_side_nav_icon_alignment">साइड नेविगेशन आइकन अलाइनमेंट</string>
-    <string name="theme_dark_amoled_hotpink">एमोलेड हॉट पिंक</string>
-    <string name="theme_dark_midnightdusk">मध्यरात्रि शाम</string>
-    <string name="theme_dark_greenapple">ग्रीन एप्पल</string>
-    <string name="theme_light_yotsuba">योत्सुबा</string>
-    <string name="theme_light_strawberrydaiquiri">स्ट्रॉबेरी दैक्विरी</string>
     <string name="action_start_downloading_now">अभी डाउनलोड करना शुरू करें</string>
     <string name="action_show_errors">त्रुटियां दिखाएं</string>
     <string name="cancel_all_for_series">इस श्रृंखला के लिए सभी रद्द करें</string>
     <string name="action_display_local_badge">स्थानीय बैज</string>
     <string name="action_sort_next_updated">अगला अपेक्षित अपडेट</string>
+    <string name="pref_dark_theme_pure_black">पूरा काला मोड़</string>
+    <string name="theme_tako">टाको</string>
+    <string name="theme_strawberrydaiquiri">स्ट्रॉबेरी</string>
+    <string name="theme_greenapple">हरा सेब</string>
+    <string name="theme_blue">लेगासी ब्लू</string>
+    <string name="theme_monet">डायनेमिक</string>
+    <string name="pref_app_theme">एप थीम</string>
+    <string name="pref_category_auto_download">ऑटोमैटिक डाउनलोड</string>
+    <string name="theme_yotsuba">योटसूबा</string>
+    <string name="theme_yinyang">यीन और यैंन्ग</string>
+    <string name="theme_tealturquoise">टील</string>
+    <string name="pref_category_appearance">रूप</string>
 </resources>

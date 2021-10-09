@@ -4,11 +4,8 @@ import android.view.View
 import androidx.core.view.isVisible
 import coil.clear
 import coil.loadAny
-import coil.transform.RoundedCornersTransformation
 import eu.davidea.flexibleadapter.FlexibleAdapter
-import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.databinding.SourceListItemBinding
-import eu.kanade.tachiyomi.util.isLocal
 
 /**
  * Class used to hold the displayed data of a manga in the library, like the cover or the title.
@@ -49,6 +46,11 @@ class LibraryListHolder(
             isVisible = item.downloadCount > 0
             text = "${item.downloadCount}"
         }
+        // Update the source language and its visibility
+        with(binding.languageText) {
+            isVisible = item.sourceLanguage.isNotEmpty()
+            text = item.sourceLanguage
+        }
         // show local text badge if local manga
         binding.localText.isVisible = item.isLocal
 
@@ -58,11 +60,8 @@ class LibraryListHolder(
             onLongClick(itemView)
         }
 
-        // Update the cover.
-        val radius = view.context.resources.getDimension(R.dimen.card_radius)
+        // Update the cover
         binding.thumbnail.clear()
-        binding.thumbnail.loadAny(item.manga) {
-            transformations(RoundedCornersTransformation(radius))
-        }
+        binding.thumbnail.loadAny(item.manga)
     }
 }

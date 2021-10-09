@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import androidx.core.content.pm.PackageInfoCompat
 import dalvik.system.PathClassLoader
-import eu.kanade.tachiyomi.annotations.Nsfw
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.extension.model.Extension
 import eu.kanade.tachiyomi.extension.model.LoadResult
@@ -13,9 +13,10 @@ import eu.kanade.tachiyomi.source.CatalogueSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.SourceFactory
 import eu.kanade.tachiyomi.util.lang.Hash
+import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority
 import uy.kohesive.injekt.injectLazy
 
 /**
@@ -103,11 +104,11 @@ internal object ExtensionLoader {
 
         val extName = pkgManager.getApplicationLabel(appInfo).toString().substringAfter("Tachiyomi: ")
         val versionName = pkgInfo.versionName
-        val versionCode = pkgInfo.versionCode
+        val versionCode = PackageInfoCompat.getLongVersionCode(pkgInfo)
 
         if (versionName.isNullOrEmpty()) {
             val exception = Exception("Missing versionName for extension $extName")
-            Timber.w(exception)
+            logcat(LogPriority.WARN, exception)
             return LoadResult.Error(exception)
         }
 
@@ -118,7 +119,7 @@ internal object ExtensionLoader {
                 "Lib version is $libVersion, while only versions " +
                     "$LIB_VERSION_MIN to $LIB_VERSION_MAX are allowed"
             )
-            Timber.w(exception)
+            logcat(LogPriority.WARN, exception)
             return LoadResult.Error(exception)
         }
 
@@ -128,7 +129,7 @@ internal object ExtensionLoader {
             return LoadResult.Error("Package $pkgName isn't signed")
         } else if (signatureHash !in trustedSignatures) {
             val extension = Extension.Untrusted(extName, pkgName, versionName, versionCode, signatureHash)
-            Timber.w("Extension $pkgName isn't trusted")
+            logcat(LogPriority.WARN) { "Extension $pkgName isn't trusted" }
             return LoadResult.Untrusted(extension)
         }
 
@@ -153,21 +154,14 @@ internal object ExtensionLoader {
                 try {
                     when (val obj = Class.forName(it, false, classLoader).newInstance()) {
                         is Source -> listOf(obj)
-                        is SourceFactory -> {
-                            if (isSourceNsfw(obj)) {
-                                emptyList()
-                            } else {
-                                obj.createSources()
-                            }
-                        }
+                        is SourceFactory -> obj.createSources()
                         else -> throw Exception("Unknown source class type! ${obj.javaClass}")
                     }
                 } catch (e: Throwable) {
-                    Timber.e(e, "Extension load error: $extName ($it)")
+                    logcat(LogPriority.ERROR, e) { "Extension load error: $extName ($it)" }
                     return LoadResult.Error(e)
                 }
             }
-            .filter { !isSourceNsfw(it) }
 
         val langs = sources.filterIsInstance<CatalogueSource>()
             .map { it.lang }
@@ -213,23 +207,5 @@ internal object ExtensionLoader {
         } else {
             null
         }
-    }
-
-    /**
-     * Checks whether a Source or SourceFactory is annotated with @Nsfw.
-     */
-    private fun isSourceNsfw(clazz: Any): Boolean {
-        if (loadNsfwSource) {
-            return false
-        }
-
-        if (clazz !is Source && clazz !is SourceFactory) {
-            return false
-        }
-
-        // Annotations are proxied, hence this janky way of checking for them
-        return clazz.javaClass.annotations
-            .flatMap { it.javaClass.interfaces.map { it.simpleName } }
-            .firstOrNull { it == Nsfw::class.java.simpleName } != null
     }
 }

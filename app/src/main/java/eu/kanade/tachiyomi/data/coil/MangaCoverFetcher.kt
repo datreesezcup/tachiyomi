@@ -10,6 +10,7 @@ import coil.network.HttpException
 import coil.request.get
 import coil.size.Size
 import eu.kanade.tachiyomi.data.cache.CoverCache
+import eu.kanade.tachiyomi.data.coil.MangaCoverFetcher.Companion.USE_CUSTOM_COVER
 import eu.kanade.tachiyomi.data.database.models.Manga
 import eu.kanade.tachiyomi.network.NetworkHelper
 import eu.kanade.tachiyomi.network.await
@@ -148,7 +149,7 @@ class MangaCoverFetcher : Fetcher<Manga> {
     private fun getResourceType(cover: String?): Type? {
         return when {
             cover.isNullOrEmpty() -> null
-            cover.startsWith("http") || cover.startsWith("Custom-", true) -> Type.URL
+            cover.startsWith("http", true) || cover.startsWith("Custom-", true) -> Type.URL
             cover.startsWith("/") || cover.startsWith("file://") -> Type.File
             else -> null
         }

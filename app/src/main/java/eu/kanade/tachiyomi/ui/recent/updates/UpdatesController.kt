@@ -25,14 +25,15 @@ import eu.kanade.tachiyomi.ui.main.MainActivity
 import eu.kanade.tachiyomi.ui.manga.MangaController
 import eu.kanade.tachiyomi.ui.manga.chapter.base.BaseChaptersAdapter
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
+import eu.kanade.tachiyomi.util.system.logcat
 import eu.kanade.tachiyomi.util.system.notificationManager
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.view.onAnimationsFinished
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.LogPriority
 import reactivecircus.flowbinding.recyclerview.scrollStateChanges
 import reactivecircus.flowbinding.swiperefreshlayout.refreshes
-import timber.log.Timber
 
 /**
  * Fragment that shows recent chapters.
@@ -82,7 +83,7 @@ class UpdatesController :
         }
         binding.actionToolbar.applyInsetter {
             type(navigationBars = true) {
-                margin(bottom = true)
+                margin(bottom = true, horizontal = true)
             }
         }
 
@@ -113,13 +114,10 @@ class UpdatesController :
                 binding.swipeRefresh.isRefreshing = false
             }
             .launchIn(viewScope)
-
-        (activity as? MainActivity)?.fixViewToBottom(binding.actionToolbar)
     }
 
     override fun onDestroyView(view: View) {
         destroyActionModeIfNeeded()
-        (activity as? MainActivity)?.clearFixViewToBottom(binding.actionToolbar)
         binding.actionToolbar.destroy()
         adapter = null
         super.onDestroyView(view)
@@ -183,7 +181,7 @@ class UpdatesController :
                 actionMode!!,
                 R.menu.updates_chapter_selection
             ) { onActionItemClicked(it!!) }
-            (activity as? MainActivity)?.showBottomNav(visible = false, collapse = true)
+            (activity as? MainActivity)?.showBottomNav(false)
         }
 
         toggleSelection(position)
@@ -303,7 +301,7 @@ class UpdatesController :
      * @param error error message
      */
     fun onChaptersDeletedError(error: Throwable) {
-        Timber.e(error)
+        logcat(LogPriority.ERROR, error)
     }
 
     override fun downloadChapter(position: Int) {
@@ -325,6 +323,11 @@ class UpdatesController :
     override fun startDownloadNow(position: Int) {
         val chapter = adapter?.getItem(position) as? UpdatesItem ?: return
         presenter.startDownloadingNow(chapter)
+    }
+
+    private fun bookmarkChapters(chapters: List<UpdatesItem>, bookmarked: Boolean) {
+        presenter.bookmarkChapters(chapters, bookmarked)
+        destroyActionModeIfNeeded()
     }
 
     /**
@@ -349,6 +352,8 @@ class UpdatesController :
             val chapters = getSelectedChapters()
             binding.actionToolbar.findItem(R.id.action_download)?.isVisible = chapters.any { !it.isDownloaded }
             binding.actionToolbar.findItem(R.id.action_delete)?.isVisible = chapters.any { it.isDownloaded }
+            binding.actionToolbar.findItem(R.id.action_bookmark)?.isVisible = chapters.any { !it.bookmark }
+            binding.actionToolbar.findItem(R.id.action_remove_bookmark)?.isVisible = chapters.all { it.bookmark }
             binding.actionToolbar.findItem(R.id.action_mark_as_read)?.isVisible = chapters.any { !it.chapter.read }
             binding.actionToolbar.findItem(R.id.action_mark_as_unread)?.isVisible = chapters.all { it.chapter.read }
         }
@@ -373,6 +378,8 @@ class UpdatesController :
             R.id.action_delete ->
                 ConfirmDeleteChaptersDialog(this, getSelectedChapters())
                     .showDialog(router)
+            R.id.action_bookmark -> bookmarkChapters(getSelectedChapters(), true)
+            R.id.action_remove_bookmark -> bookmarkChapters(getSelectedChapters(), false)
             R.id.action_mark_as_read -> markAsRead(getSelectedChapters())
             R.id.action_mark_as_unread -> markAsUnread(getSelectedChapters())
             else -> return false
@@ -389,7 +396,7 @@ class UpdatesController :
         adapter?.clearSelection()
 
         binding.actionToolbar.hide()
-        (activity as? MainActivity)?.showBottomNav(visible = true, collapse = true)
+        (activity as? MainActivity)?.showBottomNav(true)
 
         actionMode = null
     }

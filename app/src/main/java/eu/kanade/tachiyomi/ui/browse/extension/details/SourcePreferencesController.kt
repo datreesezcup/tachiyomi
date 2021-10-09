@@ -27,7 +27,9 @@ import eu.kanade.tachiyomi.source.ConfigurableSource
 import eu.kanade.tachiyomi.source.Source
 import eu.kanade.tachiyomi.source.getPreferenceKey
 import eu.kanade.tachiyomi.ui.base.controller.NucleusController
-import timber.log.Timber
+import eu.kanade.tachiyomi.util.system.logcat
+import eu.kanade.tachiyomi.widget.TachiyomiTextInputEditText.Companion.setIncognito
+import logcat.LogPriority
 
 @SuppressLint("RestrictedApi")
 class SourcePreferencesController(bundle: Bundle? = null) :
@@ -76,7 +78,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
         try {
             addPreferencesForSource(screen, source)
         } catch (e: AbstractMethodError) {
-            Timber.e("Source did not implement [addPreferencesForSource]: ${source.name}")
+            logcat(LogPriority.ERROR) { "Source did not implement [addPreferencesForSource]: ${source.name}" }
         }
 
         manager.setPreferences(screen)
@@ -112,6 +114,13 @@ class SourcePreferencesController(bundle: Bundle? = null) :
                 val pref = newScreen.getPreference(0)
                 pref.isIconSpaceReserved = false
                 pref.order = Int.MAX_VALUE // reset to default order
+
+                // Apply incognito IME for EditTextPreference
+                if (pref is EditTextPreference) {
+                    pref.setOnBindEditTextListener {
+                        it.setIncognito(viewScope)
+                    }
+                }
 
                 newScreen.removePreference(pref)
                 screen.addPreference(pref)
@@ -159,9 +168,7 @@ class SourcePreferencesController(bundle: Bundle? = null) :
         // [key] isn't useful since there may be duplicates
         return preferenceScreen!!.getPreference(lastOpenPreferencePosition!!) as T
     }
-
-    private companion object {
-        const val SOURCE_ID = "source_id"
-        const val LASTOPENPREFERENCE_KEY = "last_open_preference"
-    }
 }
+
+private const val SOURCE_ID = "source_id"
+private const val LASTOPENPREFERENCE_KEY = "last_open_preference"

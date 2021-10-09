@@ -37,6 +37,7 @@ import eu.kanade.tachiyomi.util.storage.getUriCompat
 import eu.kanade.tachiyomi.util.system.acquireWakeLock
 import eu.kanade.tachiyomi.util.system.createFileInCacheDir
 import eu.kanade.tachiyomi.util.system.isServiceRunning
+import eu.kanade.tachiyomi.util.system.logcat
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import timber.log.Timber
+import logcat.LogPriority
 import uy.kohesive.injekt.Injekt
 import uy.kohesive.injekt.api.get
 import java.io.File
@@ -212,7 +213,7 @@ class LibraryUpdateService(
 
         // Destroy service when completed or in case of an error.
         val handler = CoroutineExceptionHandler { _, exception ->
-            Timber.e(exception)
+            logcat(LogPriority.ERROR, exception)
             stopSelf(startId)
         }
         updateJob = ioScope.launch(handler) {
@@ -295,48 +296,46 @@ class LibraryUpdateService(
                                     return@async
                                 }
 
-                                currentlyUpdatingManga.add(manga)
-                                notifier.showProgressNotification(
+                                withUpdateNotification(
                                     currentlyUpdatingManga,
-                                    progressCount.get(),
-                                    mangaToUpdate.size
-                                )
+                                    progressCount,
+                                    manga,
+                                ) { manga ->
+                                    try {
+                                        val (newChapters, _) = updateManga(manga)
 
-                                try {
-                                    val (newChapters, _) = updateManga(manga)
+                                        if (newChapters.isNotEmpty()) {
+                                            if (manga.shouldDownloadNewChapters(db, preferences)) {
+                                                downloadChapters(manga, newChapters)
+                                                hasDownloads.set(true)
+                                            }
 
-                                    if (newChapters.isNotEmpty()) {
-                                        if (manga.shouldDownloadNewChapters(db, preferences)) {
-                                            downloadChapters(manga, newChapters)
-                                            hasDownloads.set(true)
+                                            // Convert to the manga that contains new chapters
+                                            newUpdates.add(
+                                                manga to newChapters.sortedByDescending { ch -> ch.source_order }
+                                                    .toTypedArray()
+                                            )
                                         }
-
-                                        // Convert to the manga that contains new chapters
-                                        newUpdates.add(manga to newChapters.sortedByDescending { ch -> ch.source_order }.toTypedArray())
+                                    } catch (e: Throwable) {
+                                        val errorMessage = when (e) {
+                                            is NoChaptersException -> {
+                                                getString(R.string.no_chapters_error)
+                                            }
+                                            is SourceManager.SourceNotInstalledException -> {
+                                                // failedUpdates will already have the source, don't need to copy it into the message
+                                                getString(R.string.loader_not_implemented_error)
+                                            }
+                                            else -> {
+                                                e.message
+                                            }
+                                        }
+                                        failedUpdates.add(manga to errorMessage)
                                     }
-                                } catch (e: Throwable) {
-                                    val errorMessage = if (e is NoChaptersException) {
-                                        getString(R.string.no_chapters_error)
-                                    } else if (e is SourceManager.SourceNotInstalledException) {
-                                        // failedUpdates will already have the source, don't need to copy it into the message
-                                        getString(R.string.loader_not_implemented_error)
-                                    } else {
-                                        e.message
+
+                                    if (preferences.autoUpdateTrackers()) {
+                                        updateTrackings(manga, loggedServices)
                                     }
-                                    failedUpdates.add(manga to errorMessage)
                                 }
-
-                                if (preferences.autoUpdateTrackers()) {
-                                    updateTrackings(manga, loggedServices)
-                                }
-
-                                currentlyUpdatingManga.remove(manga)
-                                progressCount.andIncrement
-                                notifier.showProgressNotification(
-                                    currentlyUpdatingManga,
-                                    progressCount.get(),
-                                    mangaToUpdate.size
-                                )
                             }
                         }
                     }
@@ -355,7 +354,7 @@ class LibraryUpdateService(
             }
         }
 
-        if (preferences.showLibraryUpdateErrors() && failedUpdates.isNotEmpty()) {
+        if (failedUpdates.isNotEmpty()) {
             val errorFile = writeErrorFile(failedUpdates)
             notifier.showUpdateErrorNotification(
                 failedUpdates.map { it.first.title },
@@ -382,7 +381,7 @@ class LibraryUpdateService(
         // Update manga details metadata in the background
         if (preferences.autoUpdateMetadata()) {
             val handler = CoroutineExceptionHandler { _, exception ->
-                Timber.e(exception)
+                logcat(LogPriority.ERROR, exception)
             }
             GlobalScope.launch(Dispatchers.IO + handler) {
                 val updatedManga = source.getMangaDetails(manga.toMangaInfo())
@@ -421,36 +420,35 @@ class LibraryUpdateService(
                                     return@async
                                 }
 
-                                currentlyUpdatingManga.add(manga)
-                                notifier.showProgressNotification(
+                                withUpdateNotification(
                                     currentlyUpdatingManga,
-                                    progressCount.get(),
-                                    mangaToUpdate.size
-                                )
-
-                                sourceManager.get(manga.source)?.let { source ->
-                                    try {
-                                        val networkManga =
-                                            source.getMangaDetails(manga.toMangaInfo())
-                                        val sManga = networkManga.toSManga()
-                                        manga.prepUpdateCover(coverCache, sManga, true)
-                                        sManga.thumbnail_url?.let {
-                                            manga.thumbnail_url = it
-                                            db.insertManga(manga).executeAsBlocking()
+                                    progressCount,
+                                    manga,
+                                ) { manga ->
+                                    sourceManager.get(manga.source)?.let { source ->
+                                        try {
+                                            val networkManga =
+                                                source.getMangaDetails(manga.toMangaInfo())
+                                            val sManga = networkManga.toSManga()
+                                            manga.prepUpdateCover(coverCache, sManga, true)
+                                            sManga.thumbnail_url?.let {
+                                                manga.thumbnail_url = it
+                                                db.insertManga(manga).executeAsBlocking()
+                                            }
+                                        } catch (e: Throwable) {
+                                            // Ignore errors and continue
+                                            logcat(LogPriority.ERROR, e)
                                         }
-                                    } catch (e: Throwable) {
-                                        // Ignore errors and continue
-                                        Timber.e(e)
                                     }
-                                }
 
-                                currentlyUpdatingManga.remove(manga)
-                                progressCount.andIncrement
-                                notifier.showProgressNotification(
-                                    currentlyUpdatingManga,
-                                    progressCount.get(),
-                                    mangaToUpdate.size
-                                )
+                                    currentlyUpdatingManga.remove(manga)
+                                    progressCount.andIncrement
+                                    notifier.showProgressNotification(
+                                        currentlyUpdatingManga,
+                                        progressCount.get(),
+                                        mangaToUpdate.size
+                                    )
+                                }
                             }
                         }
                     }
@@ -500,13 +498,45 @@ class LibraryUpdateService(
                                 }
                             } catch (e: Throwable) {
                                 // Ignore errors and continue
-                                Timber.e(e)
+                                logcat(LogPriority.ERROR, e)
                             }
                         }
                     }
                 }
             }
             .awaitAll()
+    }
+
+    private suspend fun withUpdateNotification(
+        updatingManga: CopyOnWriteArrayList<LibraryManga>,
+        completed: AtomicInteger,
+        manga: LibraryManga,
+        block: suspend (LibraryManga) -> Unit,
+    ) {
+        if (updateJob?.isActive != true) {
+            return
+        }
+
+        updatingManga.add(manga)
+        notifier.showProgressNotification(
+            updatingManga,
+            completed.get(),
+            mangaToUpdate.size
+        )
+
+        block(manga)
+
+        if (updateJob?.isActive != true) {
+            return
+        }
+
+        updatingManga.remove(manga)
+        completed.andIncrement
+        notifier.showProgressNotification(
+            updatingManga,
+            completed.get(),
+            mangaToUpdate.size
+        )
     }
 
     /**
