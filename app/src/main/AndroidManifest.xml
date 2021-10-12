@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="eu.kanade.tachiyomi">
 
     <!-- Internet -->
@@ -183,7 +184,12 @@
 
         <service
             android:name=".data.backup.BackupCreateService"
-            android:exported="false" />
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="eu.kanade.tachiyomi.CREATE_BACKUP"/>
+            </intent-filter>
+        </service>
 
         <service
             android:name=".data.backup.BackupRestoreService"
