@@ -187,7 +187,7 @@
             android:exported="true"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="eu.kanade.tachiyomi.CREATE_BACKUP"/>
+                <action android:name="${applicationId}.CREATE_BACKUP"/>
             </intent-filter>
         </service>
 
