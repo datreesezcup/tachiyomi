@@ -12,8 +12,8 @@ import eu.kanade.tachiyomi.data.database.DatabaseHelper
 import eu.kanade.tachiyomi.data.database.models.Category
 import eu.kanade.tachiyomi.data.library.LibraryUpdateJob
 import eu.kanade.tachiyomi.data.preference.CHARGING
+import eu.kanade.tachiyomi.data.preference.ONLY_ON_WIFI
 import eu.kanade.tachiyomi.data.preference.PreferencesHelper
-import eu.kanade.tachiyomi.data.preference.UNMETERED_NETWORK
 import eu.kanade.tachiyomi.data.preference.asImmediateFlow
 import eu.kanade.tachiyomi.data.track.TrackManager
 import eu.kanade.tachiyomi.databinding.PrefLibraryColumnsBinding
@@ -139,16 +139,13 @@ class SettingsLibraryController : SettingsController() {
                 titleRes = R.string.pref_library_update_interval
                 entriesRes = arrayOf(
                     R.string.update_never,
-                    R.string.update_3hour,
-                    R.string.update_4hour,
-                    R.string.update_6hour,
-                    R.string.update_8hour,
                     R.string.update_12hour,
                     R.string.update_24hour,
                     R.string.update_48hour,
+                    R.string.update_72hour,
                     R.string.update_weekly
                 )
-                entryValues = arrayOf("0", "3", "4", "6", "8", "12", "24", "48", "168")
+                entryValues = arrayOf("0", "12", "24", "48", "72", "168")
                 defaultValue = "24"
                 summary = "%s"
 
@@ -161,9 +158,9 @@ class SettingsLibraryController : SettingsController() {
             multiSelectListPreference {
                 key = Keys.libraryUpdateRestriction
                 titleRes = R.string.pref_library_update_restriction
-                entriesRes = arrayOf(R.string.network_unmetered, R.string.charging)
-                entryValues = arrayOf(UNMETERED_NETWORK, CHARGING)
-                defaultValue = setOf(UNMETERED_NETWORK)
+                entriesRes = arrayOf(R.string.connected_to_wifi, R.string.charging)
+                entryValues = arrayOf(ONLY_ON_WIFI, CHARGING)
+                defaultValue = setOf(ONLY_ON_WIFI)
 
                 preferences.libraryUpdateInterval().asImmediateFlow { isVisible = it > 0 }
                     .launchIn(viewScope)
@@ -179,7 +176,7 @@ class SettingsLibraryController : SettingsController() {
                         .sorted()
                         .map {
                             when (it) {
-                                UNMETERED_NETWORK -> context.getString(R.string.network_unmetered)
+                                ONLY_ON_WIFI -> context.getString(R.string.connected_to_wifi)
                                 CHARGING -> context.getString(R.string.charging)
                                 else -> it
                             }

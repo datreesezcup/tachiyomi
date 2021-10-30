@@ -204,6 +204,10 @@ class MangaPresenter(
                 val sManga = networkManga.toSManga()
                 manga.prepUpdateCover(coverCache, sManga, manualFetch)
                 manga.copyFrom(sManga)
+                if (!manga.favorite) {
+                    // if the manga isn't a favorite, set its title from source and update in db
+                    manga.title = sManga.title
+                }
                 manga.initialized = true
                 db.insertManga(manga).executeAsBlocking()
 
@@ -718,6 +722,7 @@ class MangaPresenter(
     fun setDisplayMode(mode: Int) {
         manga.displayMode = mode
         db.updateChapterFlags(manga).executeAsBlocking()
+        refreshChapters()
     }
 
     /**

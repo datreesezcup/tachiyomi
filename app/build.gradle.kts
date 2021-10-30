@@ -29,7 +29,7 @@ android {
         minSdk = AndroidConfig.minSdk
         targetSdk = AndroidConfig.targetSdk
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        versionCode = 69
+        versionCode = 71
         versionName = "0.12.3"
 
         buildConfigField("String", "COMMIT_COUNT", "\"${getCommitCount()}\"")
@@ -99,8 +99,10 @@ android {
             "LICENSE.txt",
             "META-INF/LICENSE",
             "META-INF/LICENSE.txt",
+            "META-INF/README.md",
             "META-INF/NOTICE",
             "META-INF/*.kotlin_module",
+            "META-INF/*.version",
         ))
     }
 
@@ -139,19 +141,19 @@ dependencies {
     implementation("org.tachiyomi:source-api:1.1")
 
     // AndroidX libraries
-    implementation("androidx.annotation:annotation:1.3.0-beta01")
-    implementation("androidx.appcompat:appcompat:1.4.0-beta01")
+    implementation("androidx.annotation:annotation:1.3.0-rc01")
+    implementation("androidx.appcompat:appcompat:1.4.0-rc01")
     implementation("androidx.biometric:biometric-ktx:1.2.0-alpha03")
-    implementation("androidx.browser:browser:1.4.0-beta01")
+    implementation("androidx.browser:browser:1.4.0-rc01")
     implementation("androidx.constraintlayout:constraintlayout:2.1.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("androidx.core:core-ktx:1.7.0-beta02")
+    implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.core:core-splashscreen:1.0.0-alpha02")
     implementation("androidx.recyclerview:recyclerview:1.3.0-alpha01")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
     implementation("androidx.viewpager:viewpager:1.1.0-alpha01")
 
-    val lifecycleVersion = "2.4.0-beta01"
+    val lifecycleVersion = "2.4.0"
     implementation("androidx.lifecycle:lifecycle-common:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
@@ -196,7 +198,7 @@ dependencies {
     implementation("com.github.junrar:junrar:7.4.0")
 
     // Database
-    implementation("androidx.sqlite:sqlite-ktx:2.1.0")
+    implementation("androidx.sqlite:sqlite-ktx:2.2.0-beta01")
     implementation("com.github.inorichi.storio:storio-common:8be19de@aar")
     implementation("com.github.inorichi.storio:storio-sqlite:8be19de@aar")
     implementation("com.github.requery:sqlite-android:3.36.0")
@@ -227,10 +229,10 @@ dependencies {
     implementation("com.github.gpanther:java-nat-sort:natural-comparator-1.1")
 
     // UI libraries
-    implementation("com.google.android.material:material:1.5.0-alpha04")
+    implementation("com.google.android.material:material:1.5.0-alpha05")
     implementation("com.github.dmytrodanylyk.android-process-button:library:1.0.4")
-    implementation("eu.davidea:flexible-adapter:5.1.0")
-    implementation("eu.davidea:flexible-adapter-ui:1.0.0")
+    implementation("com.github.arkon.FlexibleAdapter:flexible-adapter:c8013533")
+    implementation("com.github.arkon.FlexibleAdapter:flexible-adapter-ui:c8013533")
     implementation("com.nightlynexus.viewstatepageradapter:viewstatepageradapter:1.1.0")
     implementation("com.github.chrisbanes:PhotoView:2.3.0")
     implementation("com.github.tachiyomiorg:DirectionalViewPager:1.0.0") {

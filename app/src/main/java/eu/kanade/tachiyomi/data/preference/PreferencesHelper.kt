@@ -236,7 +236,7 @@ class PreferencesHelper(val context: Context) {
 
     fun libraryUpdateInterval() = flowPrefs.getInt(Keys.libraryUpdateInterval, 24)
 
-    fun libraryUpdateRestriction() = flowPrefs.getStringSet(Keys.libraryUpdateRestriction, setOf(UNMETERED_NETWORK))
+    fun libraryUpdateRestriction() = flowPrefs.getStringSet(Keys.libraryUpdateRestriction, setOf(ONLY_ON_WIFI))
 
     fun libraryUpdateShowTabBadge() = flowPrefs.getBoolean(Keys.libraryUpdateShowTabBadge, true)
     fun libraryUnreadUpdatesCount() = flowPrefs.getInt("library_unread_updates_count", 0)
